@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './config/reportWebVitals';
-import { LoginPage } from "./pages/login_page";
 import 'bootstrap/dist/css/bootstrap.css';
 import "bootstrap/dist/js/bootstrap.min.js";
 import './index.css';
@@ -9,11 +8,13 @@ import './index.css';
 //Initialize firebase
 import './config/firebase';
 
+import App from "./app";
+
 ReactDOM.render(
-  <React.StrictMode>
-      <LoginPage/>
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <App/>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function

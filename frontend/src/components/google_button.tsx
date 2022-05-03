@@ -13,8 +13,10 @@ const uiConfig = {
     },
 };
 
-export const Google_button = () => {
+function GoogleButton() {
     return (
         <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>
     );
 }
+
+export default GoogleButton;

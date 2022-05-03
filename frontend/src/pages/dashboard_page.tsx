@@ -1,10 +1,14 @@
-import {Header} from "../components/header";
-import firebase from 'firebase/compat/app';
+import Header from "../components/header";
 
-export const DashboardPage = () => {
+function DashboardPage() {
     return (
-        <div>
-            <Header onSignOut={() => firebase.auth().signOut()}/>
-        </div>
+        <>
+            <Header/>
+            <div>
+                <h1>Dashboard</h1>
+            </div>
+        </>
     );
 }
+
+export default DashboardPage;

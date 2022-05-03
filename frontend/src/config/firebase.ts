@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app";
+import {getAuth} from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBIlKx3OXPZ6woX8oq0jIa9zJdz4Kjb-Ic",
@@ -8,4 +9,11 @@ const firebaseConfig = {
     messagingSenderId: "796536084403",
     appId: "1:796536084403:web:2bb530200b8434dc2f9dc6"
 };
-firebase.initializeApp(firebaseConfig);
+
+const app = firebase.initializeApp(firebaseConfig);
+
+const signOut = async () => {
+    await getAuth(app).signOut();
+}
+
+export {signOut}
