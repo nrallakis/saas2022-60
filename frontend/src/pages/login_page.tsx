@@ -3,6 +3,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import {DashboardPage} from "./dashboard_page";
 import {HomePage} from "./home_page";
+import {SubscriptionPage} from "./subscription_page";
 
 export const LoginPage = () => {
     const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
@@ -16,6 +17,6 @@ export const LoginPage = () => {
     }, []);
 
     return (
-        isSignedIn ? <DashboardPage/> : <HomePage/>
+        isSignedIn ? <SubscriptionPage/> : <HomePage/>
     );
 }

@@ -17,7 +17,7 @@ export const Header = (props: HeaderProps) => {
                         <Nav className="me-auto">
                             <Nav.Link href="#home">Home</Nav.Link>
                             <Nav.Link href="#reports">Reports</Nav.Link>
-                            <Nav.Link href="#pricing">Pricing</Nav.Link>
+                            <Nav.Link href="#subscription">Subscription</Nav.Link>
                         </Nav>
                         <Navbar.Text>
                             {firebase.auth().currentUser?.email} <a href="#" onClick={props.onSignOut}>Sign out</a>
