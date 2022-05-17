@@ -24,9 +24,7 @@ def read_file(starting_date, file_ext_type="AggregatedGenerationPerType16.1.BC.c
 
         # Select columns
         data = data[["DateTime", "MapCode", "ActualGenerationOutput"]]
-        print(data)
         data.to_csv("output.csv")
-        print(time_string_format + file_ext_type)
         file_date += time_diff
 
 
