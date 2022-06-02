@@ -1,5 +1,8 @@
 import pandas as pd
 from datetime import datetime, timedelta
+import sys
+
+csvPath = sys.argv[1]
 
 def read_file(starting_date, file_ext_type="AggregatedGenerationPerType16.1.BC.csv", time_interval=(1,0,0)):
     """
@@ -27,7 +30,44 @@ def read_file(starting_date, file_ext_type="AggregatedGenerationPerType16.1.BC.c
         data.to_csv("output.csv")
         file_date += time_diff
 
+def dataToSqlFile(csv_data, outputPath):
+
+    # Create or Truncate the output file
+    outputStream = open(outputPath, "w")
+
+    sqlString = "INSERT INTO TotalLoad VALUES \n" 
+    counter = 1
+    for row in csv_data.itertuples():
+        rowData = tuple(row[1].split('\t'))
+        ArreaTypeCode = rowData[3]
+        
+        # Only interested in CTY data
+        if (ArreaTypeCode != 'CTY') :
+            continue
+        MapCode = rowData[5]
+        TotalLoadValue = rowData[6]
+        UpdateTime = rowData[7]
+        sqlString += "('{}', {}, '{}'),\n".format(MapCode, TotalLoadValue, UpdateTime)
+
+        if counter == 1000:
+            sqlString = sqlString[:-2] + ";\n"
+            sqlString += "INSERT INTO TotalLoad VALUES \n" 
+            counter = 0
+        counter+=1
+
+    sqlString = sqlString[:-2] + ";"
+    outputStream.write(sqlString)
+    outputStream.close()
+
+
+def csvToSqlFile(csvPath, outputPath):
+    csv_file = csvPath
+
+    data = pd.read_csv(csv_file)
+    dataToSqlFile(data, outputPath)
+
 
 if __name__ == "__main__":
-    read_file(starting_date = datetime(2021,10,12,12))
+    # read_file(starting_date = datetime(2021,10,12,12))
     # time_intervals tbd 
+    csvToSqlFile(csvPath, '../output.sql')
