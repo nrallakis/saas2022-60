@@ -92,7 +92,7 @@ def sortAndFilterData(csv_data, latestDateTime):
             continue
         rowData[0] = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
 
-        data.append((rowData[0], rowData[3], rowData[6], rowData[7]))
+        data.append((rowData[0], rowData[5], rowData[6], rowData[7]))
     data.sort(key=sortingCriteria)
     data = keepLatestData(data, latestDateTime)
     return data
