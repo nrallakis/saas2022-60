@@ -46,7 +46,7 @@ CREATE TABLE `AggregatedGenerationPerType` (
 -- Indexes for table `AggregatedGenerationPerType`
 --
 ALTER TABLE `AggregatedGenerationPerType`
-  ADD PRIMARY KEY (`mapCode`,`updateTime`);
+  ADD PRIMARY KEY (`mapCode`,`updateTime`, `productionType`);
 --
 -- Database: `ATL`
 --
