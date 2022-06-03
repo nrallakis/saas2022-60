@@ -5,6 +5,8 @@ services:
     image: mariadb:10.3
     container_name: energyLiveDataDB
     restart: always
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/dump.sql
     ports:
       - 3306:3306
     environment:
