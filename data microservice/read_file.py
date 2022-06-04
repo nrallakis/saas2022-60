@@ -51,8 +51,8 @@ def dbConnection():
 
     cursor = mydb.cursor()
 
-    # Typical error fix, jus to be sure
-    sql = "SET time_zone='+00:00'"
+    # Typical error fix, just to be sure
+    sql = "SET time_zone='+02:00'"
     cursor.execute(sql)
     mydb.commit()
 
