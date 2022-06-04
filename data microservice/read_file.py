@@ -65,10 +65,10 @@ def sortingCriteria(tuple):
 
 def keepLatestData(dataList, latestDateTime):
     data = []
-    if (not dataList):
+    if not dataList:
         return data
     for i in range(len(dataList) - 1, -1, -1):
-        if (dataList[i][0] < latestDateTime):
+        if dataList[i][0] < latestDateTime:
             return data
         data.append(dataList[i])
 
@@ -79,7 +79,7 @@ def sortAndFilterData(csv_data, latestDateTime):
         rowData = row[1].split('\t')
         AreaTypeCode = rowData[3]
         # Only interested in CTY data
-        if (AreaTypeCode != 'CTY'):
+        if AreaTypeCode != 'CTY':
             continue
         rowData[0] = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
 
@@ -107,13 +107,13 @@ def dataToSqlFile(csv_data, outputPath, latestDateTime):
         sqlString += "('{}', '{}', {}, '{}'),\n".format(DateTime,
                                                         MapCode, TotalLoadValue, UpdateTime)
 
-        if (counter % 1000 == 0):
+        if counter % 1000 == 0:
             sqlString = sqlString[:-2] + '\n'
             sqlString += "ON DUPLICATE KEY UPDATE "
             sqlString += "datetime = Value(dateTime), actualTotalLoad = Value(actualTotalLoad), updateTime = Value(updateTime);\n"
             sqlString += "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
         counter += 1
-    if (counter % 1000 != 0):
+    if counter % 1000 != 0:
         sqlString = sqlString[:-2] + '\n'
         sqlString += "ON DUPLICATE KEY UPDATE "
         sqlString += "datetime = Value(dateTime), actualTotalLoad = Value(actualTotalLoad), updateTime = Value(updateTime);\n"
