@@ -1,0 +1,9 @@
+version: '3'
+services:
+  sftp:
+    image: atmoz/sftp
+    volumes:
+      - ./ftp_volume:/home/energyliveftp/data
+    ports:
+      - "2222:22"
+    command: energyliveftp:root:1001
