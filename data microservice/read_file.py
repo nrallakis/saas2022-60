@@ -1,73 +1,119 @@
+import os
+import mariadb
 import pandas as pd
 from datetime import datetime, timedelta
 import sys
 
-csvPath = sys.argv[1]
 
-def read_file(starting_date, file_ext_type="AggregatedGenerationPerType16.1.BC.csv", time_interval=(1,0,0)):
-    """
-    Starts from a custom datetime (in a real situation would be datetime.now()), reads file(s) with refresh rate equal to time_interval
-    -starting_date: (years, month, day, hour)
-    -file_ext_type: the whole extension of the file as string - not sure if it is useful to be changed
-    -time_interval: (sec, min, h) of the refresh rate
-    """
-    time_diff = timedelta(seconds=time_interval[0], minutes=time_interval[1], hours=time_interval[2])
-    file_date = starting_date
-    while True:
-        time_string_format = file_date.strftime("%y_%m_%d_%H_")
-        data = pd.read_csv(time_string_format + file_ext_type, sep='\t')
+def connectToDataBase():
+    host_name = os.environ.get('DB_HOST_NAME', '127.0.0.1')
+    mydb = mariadb.connect(
+        host=host_name,
+        user='root',
+        passwd='root',
+        db='ATL',
+        port=3306
+    )
 
-        # Remove type codes <> CTY
-        data = data[data["AreaTypeCode"] == "CTY"]
+    cursor = mydb.cursor()
+    return mydb, cursor
 
-        # Remove row with update time < now
-        # filter by single day
-        # data = data[data['UpdatedTime'].dt.strftime('%Y-%m-%d') == '2014-01-01']
-        data = data.sort_values(by="DateTime")
 
-        # Select columns
-        data = data[["DateTime", "MapCode", "ActualGenerationOutput"]]
-        data.to_csv("output.csv")
-        file_date += time_diff
+def sortByDate(row):
+    # Contains the timestamp when the value was sent
+    return row[0]
 
-def dataToSqlFile(csv_data, outputPath):
 
+def keepDataAfter(dataList, latestDateTime):
+    if not dataList:
+        return []
+
+    result = []
+    for row in reversed(dataList):
+        if row[0] < latestDateTime:
+            return result
+        result.append(row)
+
+
+def sortAndFilterData(csv_data, latestDateTime):
+    data = []
+    for row in csv_data.itertuples():
+        rowData = row[1].split('\t')
+        areaTypeCode = rowData[3]
+
+        # Only interested in CTY data
+        if areaTypeCode != 'CTY':
+            continue
+
+        dateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
+        mapCode = rowData[5]
+        totalLoadValue = rowData[6]
+        updateTime = rowData[7]
+        data.append((dateTime, mapCode, totalLoadValue, updateTime))
+
+    data.sort(key=sortByDate)
+    data = keepDataAfter(data, latestDateTime)
+    return data
+
+
+def batchInsertSuffix(sqlString):
+    sqlString = sqlString[:-2] + '\n'
+    sqlString += "ON DUPLICATE KEY UPDATE "
+    sqlString += "datetime = Value(dateTime), " \
+                 "actualTotalLoad = Value(actualTotalLoad), " \
+                 "updateTime = Value(updateTime);\n"
+    return sqlString
+
+
+def dataToSqlFile(csv_data, outputPath, latestDateTime):
     # Create or Truncate the output file
     outputStream = open(outputPath, "w")
-
-    sqlString = "INSERT INTO TotalLoad VALUES \n" 
+    data = sortAndFilterData(csv_data, latestDateTime)
+    sqlString = "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
     counter = 1
-    for row in csv_data.itertuples():
-        rowData = tuple(row[1].split('\t'))
-        ArreaTypeCode = rowData[3]
-        
-        # Only interested in CTY data
-        if (ArreaTypeCode != 'CTY') :
-            continue
-        MapCode = rowData[5]
-        TotalLoadValue = rowData[6]
-        UpdateTime = rowData[7]
-        sqlString += "('{}', {}, '{}'),\n".format(MapCode, TotalLoadValue, UpdateTime)
+    # Traverse in ASC datetime order. This way the latest update will be the one staying in the DB
+    for row in reversed(data):
+        DateTime = row[0]
+        MapCode = row[1]
+        UpdateTime = row[3]
+        TotalLoadValue = row[2]
 
-        if counter == 1000:
-            sqlString = sqlString[:-2] + ";\n"
-            sqlString += "INSERT INTO TotalLoad VALUES \n" 
-            counter = 0
-        counter+=1
+        # Broken into lines for better reading
+        sqlString += "('{}', '{}', {}, '{}'),\n".format(DateTime, MapCode, TotalLoadValue, UpdateTime)
 
-    sqlString = sqlString[:-2] + ";"
+        if counter % 1000 == 0:
+            sqlString = batchInsertSuffix(sqlString)
+            sqlString += "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
+        counter += 1
+
+    if counter % 1000 != 0:
+        sqlString = batchInsertSuffix(sqlString)
+
     outputStream.write(sqlString)
     outputStream.close()
 
+    database, cursor = connectToDataBase()
+    cursor.execute(sqlString)
+    database.commit()
 
-def csvToSqlFile(csvPath, outputPath):
+
+def csvToSqlFile(csvPath, outputPath, latestDateTime):
     csv_file = csvPath
 
     data = pd.read_csv(csv_file)
-    dataToSqlFile(data, outputPath)
+    dataToSqlFile(data, outputPath, latestDateTime)
+
+
+def extractDateFromFile(csvPath):
+    year, month, day, hour, etc = csvPath.split("_")
+    year = year[-4:]
+    currentDateTime = datetime(int(year), int(month), int(day), int(hour))
+    latestDateTime = currentDateTime - timedelta(hours=1)
+    return latestDateTime
 
 
 if __name__ == "__main__":
-    # read_file(starting_date = datetime(2021,10,12,12))
-    # time_intervals tbd 
-    csvToSqlFile(csvPath, '../output.sql')
+    csvPath = sys.argv[1]
+    latestDateTime = extractDateFromFile(csvPath)
+
+    csvToSqlFile(csvPath, '../output.sql', latestDateTime)
