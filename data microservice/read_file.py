@@ -1,6 +1,7 @@
 import os
 from pickle import TRUE
 from sqlite3 import Cursor
+from xmlrpc.client import DateTime
 import mariadb
 from unittest import case
 import pandas as pd
@@ -58,16 +59,6 @@ def dbConnection():
     return mydb, cursor
 
 
-def fetchCurrentMonthData():
-    database, cursor = dbConnection()
-    sqlQuery = 'SELECT * FROM ActualTotalLoad WHERE MONTH(updateTime) = MONTH(CURDATE()) AND YEAR(updateTime)=YEAR(CURDATE())'
-
-    cursor.execute(sqlQuery)
-    database.commit()
-
-    return cursor
-
-
 def sortingCriteria(tuple):
     return tuple[0]
 
@@ -103,27 +94,29 @@ def dataToSqlFile(csv_data, outputPath, latestDateTime):
     # Create or Truncate the output file
     outputStream = open(outputPath, "w")
     data = sortAndFilterData(csv_data, latestDateTime)
-    print(data)
-
-    sqlString = "INSERT INTO ActualTotalLoad VALUES \n"
+    sqlString = "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
     counter = 1
+    # Traverse in ASC datetime order. This way the latest update will be the one staying in the DB
+    for i in range(len(data) - 1, -1, -1):
+        DateTime = data[i][0]
+        MapCode = data[i][1]
+        UpdateTime = data[i][3]
+        TotalLoadValue = data[i][2]
 
-    # for row in data:
+        # Broken into lines for better reading
+        sqlString += "('{}', '{}', {}, '{}'),\n".format(DateTime,
+                                                        MapCode, TotalLoadValue, UpdateTime)
 
-    #     MapCode = rowData[5]
-    #     TotalLoadValue = rowData[6]
-    #     UpdateTime = rowData[7]
-    #     sqlString += "('{}', {}, '{}'),\n".format(MapCode,
-    #                                               TotalLoadValue, UpdateTime)
-
-    #     if counter == 1000:
-    #         sqlString = sqlString[:-2] + ";\n"
-    #         sqlString += "INSERT INTO ActualTotalLoad VALUES \n"
-    #         counter = 1
-    #     counter += 1
-
-    sqlString = sqlString[:-2]
-
+        if (counter % 1000 == 0):
+            sqlString = sqlString[:-2] + '\n'
+            sqlString += "ON DUPLICATE KEY UPDATE "
+            sqlString += "datetime = Value(dateTime), actualTotalLoad = Value(actualTotalLoad), updateTime = Value(updateTime);\n"
+            sqlString += "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
+        counter += 1
+    if (counter % 1000 != 0):
+        sqlString = sqlString[:-2] + '\n'
+        sqlString += "ON DUPLICATE KEY UPDATE "
+        sqlString += "datetime = Value(dateTime), actualTotalLoad = Value(actualTotalLoad), updateTime = Value(updateTime);\n"
     outputStream.write(sqlString)
     outputStream.close()
 
@@ -149,6 +142,3 @@ if __name__ == "__main__":
     latestDateTime = currentDateTime - timedelta(hours=1)
 
     csvToSqlFile(csvPath, '../output.sql', latestDateTime)
-    output = fetchCurrentMonthData()
-    for row in output:
-        print(row)
