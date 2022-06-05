@@ -47,9 +47,12 @@ def sortAndFilterData(csv_data, latestDateTime):
 
         dateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
         mapCode = rowData[5]
-        totalLoadValue = rowData[6]
-        updateTime = rowData[7]
-        data.append((dateTime, mapCode, totalLoadValue, updateTime))
+        productionType = rowData[6]
+        actualGenerationOutput = rowData[7]
+        actualConsumption = rowData[8]
+        updateTime = rowData[9]
+        data.append((dateTime, mapCode, productionType,
+                    actualGenerationOutput, actualConsumption, updateTime))
 
     data.sort(key=sortByDate)
     data = keepDataAfter(data, latestDateTime)
@@ -60,7 +63,8 @@ def batchInsertSuffix(sqlString):
     sqlString = sqlString[:-2] + '\n'
     sqlString += "ON DUPLICATE KEY UPDATE "
     sqlString += "datetime = Value(dateTime), " \
-                 "actualTotalLoad = Value(actualTotalLoad), " \
+                 "actualGenerationOutput = Value(actualGenerationOutput), " \
+                 "actualConsumption = Value(actualConsumption), " \
                  "updateTime = Value(updateTime);\n"
     return sqlString
 
@@ -69,24 +73,29 @@ def dataToSqlFile(csv_data, outputPath, latestDateTime):
     # Create or Truncate the output file
     outputStream = open(outputPath, "w")
     data = sortAndFilterData(csv_data, latestDateTime)
-    sqlString = "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
+    sqlString = "INSERT INTO AggregatedGenerationPerType (" \
+                "dateTime, mapCode, productionType, actualGenerationOutput, " \
+                "actualConsumption ,updateTime) VALUES\n"
     counter = 1
     # Traverse in ASC datetime order. This way the latest update will be the one staying in the DB
     for row in reversed(data):
-        DateTime = row[0]
-        MapCode = row[1]
-        UpdateTime = row[3]
-        TotalLoadValue = row[2]
+        dateTime = row[0]
+        mapCode = row[1]
+        productionType = row[2]
+        actualGenerationOutput = row[3]
+        actualConsumption = row[4]
+        updateTime = row[5]
 
         # Broken into lines for better reading
-        sqlString += "('{}', '{}', {}, '{}'),\n".format(DateTime,
-                                                        MapCode, TotalLoadValue, UpdateTime)
+        sqlString += "('{}', '{}', {}, '{}'),\n".format(dateTime,
+                                                        mapCode, productionType, actualGenerationOutput, actualConsumption, updateTime)
 
         if counter % 1000 == 0:
             sqlString = batchInsertSuffix(sqlString)
-            sqlString += "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
+            sqlString += "INSERT INTO AggregatedGenerationPerType (" \
+                "dateTime, mapCode, productionType, actualGenerationOutput, " \
+                "actualConsumption ,updateTime) VALUES\n"
         counter += 1
-
     if counter % 1000 != 0:
         sqlString = batchInsertSuffix(sqlString)
 
