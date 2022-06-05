@@ -82,13 +82,13 @@ def dataToSqlFile(csv_data, outputPath, latestDateTime):
         dateTime = row[0]
         mapCode = row[1]
         productionType = row[2]
-        actualGenerationOutput = row[3]
-        actualConsumption = row[4]
+        actualGenerationOutput = row[3] if row[3] else 'NULL'
+        actualConsumption = row[4] if row[4] else 'NULL'
         updateTime = row[5]
 
         # Broken into lines for better reading
-        sqlString += "('{}', '{}', {}, '{}'),\n".format(dateTime,
-                                                        mapCode, productionType, actualGenerationOutput, actualConsumption, updateTime)
+        sqlString += "('{}', '{}', '{}', {}, {}, '{}'),\n".format(dateTime,
+                                                                  mapCode, productionType, actualGenerationOutput, actualConsumption, updateTime)
 
         if counter % 1000 == 0:
             sqlString = batchInsertSuffix(sqlString)

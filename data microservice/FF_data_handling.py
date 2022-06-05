@@ -11,7 +11,7 @@ def connectToDataBase():
         host=host_name,
         user='root',
         passwd='root',
-        db='ATL',
+        db='FF',
         port=3306
     )
 
@@ -39,17 +39,19 @@ def sortAndFilterData(csv_data, latestDateTime):
     data = []
     for row in csv_data.itertuples():
         rowData = row[1].split('\t')
-        areaTypeCode = rowData[3]
+        outAreaTypeCode = rowData[3]
+        inAreaTypeCode = rowData[7]
 
         # Only interested in CTY data
-        if areaTypeCode != 'CTY':
+        if outAreaTypeCode != 'CTY' or outAreaTypeCode != 'CTY':
             continue
 
         dateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
-        mapCode = rowData[5]
-        totalLoadValue = rowData[6]
-        updateTime = rowData[7]
-        data.append((dateTime, mapCode, totalLoadValue, updateTime))
+        outMapCode = rowData[5]
+        inMapCode = rowData[9]
+        flowValue = rowData[10]
+        updateTime = rowData[11]
+        data.append((dateTime, outMapCode, inMapCode, flowValue, updateTime))
 
     data.sort(key=sortByDate)
     data = keepDataAfter(data, latestDateTime)
@@ -60,7 +62,7 @@ def batchInsertSuffix(sqlString):
     sqlString = sqlString[:-2] + '\n'
     sqlString += "ON DUPLICATE KEY UPDATE "
     sqlString += "datetime = Value(dateTime), " \
-                 "actualTotalLoad = Value(actualTotalLoad), " \
+                 "flowValue = Value(flowValue), " \
                  "updateTime = Value(updateTime);\n"
     return sqlString
 
@@ -69,21 +71,25 @@ def dataToSqlFile(csv_data, outputPath, latestDateTime):
     # Create or Truncate the output file
     outputStream = open(outputPath, "w")
     data = sortAndFilterData(csv_data, latestDateTime)
-    sqlString = "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
+    sqlString = "INSERT INTO PhysicalFlows "\
+                "(dateTime, outMapCode, inMapCode, flowValue, updateTime) VALUES\n"
     counter = 1
     # Traverse in ASC datetime order. This way the latest update will be the one staying in the DB
     for row in reversed(data):
-        DateTime = row[0]
-        MapCode = row[1]
-        UpdateTime = row[3]
-        TotalLoadValue = row[2]
+        dateTime = row[0]
+        outMapCode = row[1]
+        inMapCode = row[2]
+        flowValue = row[3] if row[3] else 'NULL'
+        updateTime = row[4]
 
         # Broken into lines for better reading
-        sqlString += "('{}', '{}', {}, '{}'),\n".format(DateTime, MapCode, TotalLoadValue, UpdateTime)
+        sqlString += "('{}', '{}', '{}', {}, '{}'),\n".format(dateTime,
+                                                              outMapCode, inMapCode, flowValue, updateTime)
 
         if counter % 1000 == 0:
             sqlString = batchInsertSuffix(sqlString)
-            sqlString += "INSERT INTO ActualTotalLoad (dateTime, mapCode, actualTotalLoad, updateTime) VALUES\n"
+            sqlString += "INSERT INTO PhysicalFlows " \
+                "(dateTime, outMapCode, inMapCode, flowValue, updateTime) VALUES\n"
         counter += 1
 
     if counter % 1000 != 0:

@@ -76,10 +76,11 @@ def dataToSqlFile(csv_data, outputPath, latestDateTime):
         DateTime = row[0]
         MapCode = row[1]
         UpdateTime = row[3]
-        TotalLoadValue = row[2]
+        TotalLoadValue = row[2] if row[2] else 'NULL'
 
         # Broken into lines for better reading
-        sqlString += "('{}', '{}', {}, '{}'),\n".format(DateTime, MapCode, TotalLoadValue, UpdateTime)
+        sqlString += "('{}', '{}', {}, '{}'),\n".format(DateTime,
+                                                        MapCode, TotalLoadValue, UpdateTime)
 
         if counter % 1000 == 0:
             sqlString = batchInsertSuffix(sqlString)
