@@ -32,8 +32,8 @@ USE `AGPT`;
 CREATE TABLE `AggregatedGenerationPerType` (
   `mapCode` varchar(2) NOT NULL,
   `productionType` varchar(50) NOT NULL,
-  `actualGenerationOutput` float NOT NULL,
-  `actualConsumption` float DEFAULT NULL,
+  `actualGenerationOutput` float,
+  `actualConsumption` float,
   `updateTime` datetime NOT NULL,
   `dateTime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -46,7 +46,7 @@ CREATE TABLE `AggregatedGenerationPerType` (
 -- Indexes for table `AggregatedGenerationPerType`
 --
 ALTER TABLE `AggregatedGenerationPerType`
-  ADD PRIMARY KEY (`mapCode`,`updateTime`);
+  ADD PRIMARY KEY (`mapCode`,`updateTime`, `productionType`);
 --
 -- Database: `ATL`
 --
@@ -61,7 +61,7 @@ USE `ATL`;
 
 CREATE TABLE `ActualTotalLoad` (
   `mapCode` varchar(10) NOT NULL,
-  `actualTotalLoad` float NOT NULL,
+  `actualTotalLoad` float,
   `updateTime` datetime NOT NULL,
   `dateTime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -90,7 +90,7 @@ USE `FF`;
 CREATE TABLE `PhysicalFlows` (
   `outMapCode` varchar(2) NOT NULL,
   `inMapCode` varchar(2) NOT NULL,
-  `flowValue` float NOT NULL,
+  `flowValue` float,
   `updateTime` datetime NOT NULL,
   `dateTime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
