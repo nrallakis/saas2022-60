@@ -3,7 +3,6 @@
 ## Μέλη της ομάδας saas2022-60:
 - Andreas Vatistas | el18020
 - Vasilis Vrettos | el18126
-- Christiana Kostaki | el18136
 - Avgoustinos - Nektarios Dritsas | el18142
 - Nicholas Rallakis | el18150
 - Alexandros Tsafos | el18211
