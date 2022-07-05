@@ -1,3 +1,5 @@
+# noinspection SqlNoDataSourceInspectionForFile
+
 -- phpMyAdmin SQL Dump
 -- version 5.2.0
 -- https://www.phpmyadmin.net/
@@ -74,7 +76,7 @@ CREATE TABLE `ActualTotalLoad` (
 -- Indexes for table `ActualTotalLoad`
 --
 ALTER TABLE `ActualTotalLoad`
-  ADD PRIMARY KEY (`mapCode`,`updateTime`);
+  ADD PRIMARY KEY (`mapCode`,`dateTime`);
 --
 -- Database: `FF`
 --
