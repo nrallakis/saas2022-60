@@ -1,4 +1,5 @@
 import Header from "../components/header";
+import DatePicker from "../components/DatePicker";
 
 function DashboardPage() {
     return (
@@ -6,6 +7,7 @@ function DashboardPage() {
             <Header/>
             <div>
                 <h1>Dashboard</h1>
+                <DatePicker />
             </div>
         </>
     );
