@@ -61,13 +61,12 @@ def connectToDatabase(databaseName):
 
 def csv_path(starting_date, file_ext_type="AggregatedGenerationPerType16.1.BC.csv", time_interval=(0,0,1)):
     """
-    -starting_date: (years, month, day, hour)
+    -starting_date: eg. 2000_01_01_01
     -file_ext_type: the whole extension of the file as string - not sure if it is useful to be changed
     -time_interval: (sec, min, h) of the refresh rate
     """
     time_diff = timedelta(seconds=time_interval[0], minutes=time_interval[1], hours=time_interval[2])
-    file_date = datetime(*starting_date)
-    file_date += time_diff
-    time_string_format = file_date.strftime("%Y_%m_%d_%H_")
-    csv_path = time_string_format + file_ext_type
-    return csv_path
+    file_date = datetime(*map(int, starting_date.split('_'))) + time_diff
+    file_date_string = file_date.strftime("%Y_%m_%d_%H")
+    csv_path = file_date_string + '_' + file_ext_type
+    return file_date_string, csv_path
