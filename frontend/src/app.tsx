@@ -12,8 +12,16 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Navigate to={"/dashboard"}/>}/>
                     <Route path="/login" element={<LoginPage/>}/>
-                    <Route path="/dashboard" element={<RequireAuth><DashboardPage/></RequireAuth>}/>
-                    <Route path="/subscription" element={<RequireAuth><SubscriptionPage/></RequireAuth>}/>
+                    <Route path="/dashboard" element={
+                        <RequireAuth>
+                            <DashboardPage/>
+                        </RequireAuth>
+                    }/>
+                    <Route path="/subscription" element={
+                        <RequireAuth>
+                            <SubscriptionPage/>
+                        </RequireAuth>
+                    }/>
                 </Routes>
             </AuthProvider>
         </BrowserRouter>
