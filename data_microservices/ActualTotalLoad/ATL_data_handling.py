@@ -1,5 +1,7 @@
-from data_microservices.Shared.utils import *
+import sys
+sys.path.append("../Shared")
 
+from utils import *
 
 def sortByDate(row):
     dateTime = row[0]
@@ -102,4 +104,5 @@ def find_diffs(data_prev, data_new):
             i += 1
             j += 1
             continue
+    return diffs
 

@@ -1,6 +1,7 @@
 import sys
 import PhysicalFlow.FF_data_handling as ff
-from data_microservices.Shared.utils import loadAndFilterData, sendDataToFile, sendDataToDatabase
+sys.path.append("../Shared")
+from utils import *
 
 if __name__ == "__main__":
     csvPath = sys.argv[1]

@@ -1,4 +1,6 @@
-from Shared.utils import *
+import sys
+sys.path.append("../Shared")
+from utils import *
 
 
 def filterData(csvData, latestDateTime):
