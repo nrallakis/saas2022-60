@@ -1,4 +1,7 @@
-from data_microservices.Shared.utils import *
+import sys
+sys.path.append("../Shared")
+
+from utils import *
 
 
 def sortByDate(row):
@@ -70,15 +73,16 @@ def dataToSql(data):
     return sqlString
 
 def find_diffs(data_prev, data_new):
-    """
-    type = 'AGPT', 'ATL', 'FF'
-    """
     prev = sort_data(data_prev)
     new = sort_data(data_new)
     i, j = 0, 0
     length = len(new)
+    length_prev = len(prev)
     diffs = []
     while(i < length):
+        if j>=length_prev:
+            diffs += new[i:]
+            break
         # datetime comparison
         if(new[i][0] < prev[j][0]):
             diffs.append(new[i])
@@ -97,7 +101,7 @@ def find_diffs(data_prev, data_new):
             j += 1
             continue
 
-        # same measurement go on (date, mapcode, actualGenerationOutput, actualConsumption)
+        # same measurement go on (dateTime, mapCode, productionType, actualGenerationOutput, actualConsumption, updateTime))
         if(new[i][0] == prev[j][0] \
             and new[i][1] == prev[j][1]\
                 and new[i][3] == prev[j][3]\

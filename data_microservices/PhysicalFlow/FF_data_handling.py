@@ -68,8 +68,12 @@ def find_diffs(data_prev, data_new):
     new = sort_data(data_new)
     i, j = 0, 0
     length = len(new)
+    length_prev = len(prev)
     diffs = []
     while(i < length):
+        if j>=length_prev:
+            diffs += new[i:]
+            break
         # datetime comparison
         if(new[i][0] < prev[j][0]):
             diffs.append(new[i])
