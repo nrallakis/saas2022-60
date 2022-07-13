@@ -19,7 +19,7 @@ def filterData(csvData, latestDateTime):
         dateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
         mapCode = rowData[5]
         totalLoadValue = rowData[6]
-        updateTime = rowData[7]
+        updateTime = datetime.strptime(rowData[7], "%Y-%m-%d %H:%M:%S.000")
         data.append((dateTime, mapCode, totalLoadValue, updateTime))
 
     data.sort(key=sortByDate)
@@ -58,4 +58,48 @@ def dataToSql(data):
         sqlString = appendBatchEnding(sqlString)
 
     return sqlString
+
+def find_diffs(data_prev, data_new):
+    prev = sort_data(data_prev)
+    new = sort_data(data_new)
+    i, j = 0, 0
+    length = len(new)
+    diffs = []
+    while(i < length):
+        # datetime comparison
+        if(new[i][0] < prev[j][0]):
+            diffs.append(new[i])
+            i += 1
+            continue
+        if(new[i][0] > prev[j][0]):
+            j += 1
+            continue
+
+        # mapCode comparison
+        if(new[i][1] < prev[j][1]):
+            diffs.append(new[i])
+            i += 1
+            continue
+        if(new[i][1] > prev[j][1]):
+            j += 1
+            continue
+
+        # same measurement go on (dateTime, mapCode, totalLoadValue, updateTime)
+        if(new[i][0] == prev[j][0] \
+            and new[i][1] == prev[j][1]\
+                and new[i][2] == prev[j][2]):
+            i += 1
+            j += 1
+            continue
+
+        # regarding update time - keep the newer one
+        if(new[i][3] > prev[j][3]):
+            diffs.append(new[i])
+            i += 1
+            j += 1
+            continue
+        if(new[i][3] < prev[j][3]):
+            i += 1
+            j += 1
+            continue
 

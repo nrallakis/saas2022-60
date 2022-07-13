@@ -70,3 +70,11 @@ def csv_path(starting_date, file_ext_type="AggregatedGenerationPerType16.1.BC.cs
     file_date_string = file_date.strftime("%Y_%m_%d_%H")
     csv_path = file_date_string + '_' + file_ext_type
     return file_date_string, csv_path
+
+
+def sort_data(data):
+    data_sorted = sorted(data, key=lambda x:(x[0],x[1]))
+    return data_sorted
+
+if __name__ == '__main__':
+    pass

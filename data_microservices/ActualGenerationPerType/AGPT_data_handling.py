@@ -21,7 +21,7 @@ def filterData(csv_data, latestDateTime):
         productionType = rowData[6]
         actualGenerationOutput = rowData[7]
         actualConsumption = rowData[8]
-        updateTime = rowData[9]
+        updateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
         data.append((dateTime, mapCode, productionType,
                     actualGenerationOutput, actualConsumption, updateTime))
 
@@ -68,3 +68,54 @@ def dataToSql(data):
         sqlString = appendBatchEnding(sqlString)
 
     return sqlString
+
+def find_diffs(data_prev, data_new):
+    """
+    type = 'AGPT', 'ATL', 'FF'
+    """
+    prev = sort_data(data_prev)
+    new = sort_data(data_new)
+    i, j = 0, 0
+    length = len(new)
+    diffs = []
+    while(i < length):
+        # datetime comparison
+        if(new[i][0] < prev[j][0]):
+            diffs.append(new[i])
+            i += 1
+            continue
+        if(new[i][0] > prev[j][0]):
+            j += 1
+            continue
+
+        # mapCode comparison
+        if(new[i][1] < prev[j][1]):
+            diffs.append(new[i])
+            i += 1
+            continue
+        if(new[i][1] > prev[j][1]):
+            j += 1
+            continue
+
+        # same measurement go on (date, mapcode, actualGenerationOutput, actualConsumption)
+        if(new[i][0] == prev[j][0] \
+            and new[i][1] == prev[j][1]\
+                and new[i][3] == prev[j][3]\
+                    and new[i][4] == prev[j][4]):
+            i += 1
+            j += 1
+            continue
+
+
+        # regarding update time - keep the newer one
+        if(new[i][5] > prev[j][5]):
+            diffs.append(new[i])
+            i += 1
+            j += 1
+            continue
+        if(new[i][5] < prev[j][5]):
+            i += 1
+            j += 1
+            continue
+    
+    return diffs
