@@ -1,6 +1,6 @@
 import Header from "../components/header";
-import DatePicker from "../components/DatePicker";
-import DropDownGroup, {DropDownGroupState} from "../components/drop_down_group";
+import DatePicker from "../components/date_picker";
+import DropDownGroup, {DropDownChangeListener, QuantityType} from "../components/drop_down_group";
 import {useEffect, useState} from "react";
 import {Points} from "../data/point";
 import {EnergyService, MockDataService} from "../data/energy_service";
@@ -12,18 +12,20 @@ interface DashboardState {
     data?: Points | null;
     dateFrom?: Date | null;
     dateTo?: Date | null;
-    dropDownSelections?: DropDownGroupState | null;
+    dropDownSelections?: DropDownChangeListener | null;
 }
 
 function DashboardPage() {
     let service: EnergyService = new MockDataService();
 
+    //TODO: connect to websocket to listen to updates
+    //TODO: onDataUpdate(): if data == the same with the filtered, refresh
+
     // Component did mount
-    useEffect(() => {
-    }, []);
+    useEffect(() => {}, []);
 
     const initialState : DashboardState = {
-        data: [],
+        data: [[1,1], [1,2], [2,3]],
         dateFrom: null,
         dateTo: null,
         dropDownSelections: null,
@@ -31,14 +33,57 @@ function DashboardPage() {
     }
     const [state, setState] = useState(initialState);
 
-    function onDropDownChange(state: DropDownGroupState) {
+    useEffect(() => {
+        console.log(state);
+    }, [state]);
 
+    function onDateChange(dateFrom: Date, dateTo?: Date) {
+        dateTo ??= new Date();
+        setState({
+            ...state,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+        })
     }
 
-    function onFilterClicked() {
-        setState({...state, loading: true});
-        //Do api call and set state with the new data
-        setState({...state, loading: false});
+    function onDropDownChange(dropDownSelections: DropDownChangeListener) {
+        setState({
+            ...state,
+            dropDownSelections: dropDownSelections
+        });
+    }
+
+    async function onFilterClicked(): Promise<void> {
+        //setState({...state, loading: true});
+        const quantity = state.dropDownSelections?.quantity;
+        const dateStart = state.dateFrom!;
+        const dateEnd = state.dateTo!;
+        switch (quantity) {
+            case QuantityType.actualTotalLoad:
+                var country = state.dropDownSelections?.secondSelection!;
+                setState({
+                    ...state,
+                    data: await service.fetchActualTotalLoad(country, dateStart, dateEnd)
+                });
+                break;
+            case QuantityType.generationPerType:
+                country = state.dropDownSelections?.secondSelection!;
+                const generationType = state.dropDownSelections?.thirdSelection!;
+                setState({
+                    ...state,
+                    data: await service.fetchGenerationPerType(country, generationType, dateStart, dateEnd)
+                });
+                break;
+            case QuantityType.crossBorderFlows:
+                const countryFrom = state.dropDownSelections?.secondSelection!;
+                const countryTo = state.dropDownSelections?.thirdSelection!;
+                setState({
+                    ...state,
+                    data: await service.fetchCrossBorderFlows(countryFrom, countryTo, dateStart, dateEnd)
+                });
+                break;
+        }
+        //setState({...state, loading: false});
     }
 
     return (
@@ -47,16 +92,15 @@ function DashboardPage() {
             <div className="container pt-4">
                 <div className="row">
                     <div className="col" >
-                        <DatePicker />
+                        <DatePicker onChange={onDateChange}/>
                         <DropDownGroup onChange={onDropDownChange} />
                         <div className="pt-3" />
                         <Button onClick={onFilterClicked}>Filter</Button>
                     </div>
                     <div className="col" >
-                        <Chart />
+                        <Chart data={state.data!} />
                     </div>
                 </div>
-
             </div>
         </>
     );

@@ -1,72 +1,123 @@
 import {Dropdown} from 'react-bootstrap';
 import {useState, useEffect} from 'react';
 import DropdownButton from 'react-bootstrap/DropdownButton'
+import { EnergyService, MockDataService } from '../data/energy_service';
 
 export interface DropDownGroupState {
-    quantity: String;
+    quantity: QuantityType;
+    secondSelection: String;
+    thirdSelection: String;
+    secondOptions: String[];
+    thirdOptions: String[];
+    secondSelectionTitle: String,
+    thirdSelectionTitle: String,
+}
+
+export interface DropDownChangeListener {
+    quantity: QuantityType;
     secondSelection: String;
     thirdSelection: String;
 }
 
+export enum QuantityType {
+    actualTotalLoad, generationPerType, crossBorderFlows   
+}
+
+const quantityTypesLabels = [
+    'Actual total load',
+    'Generation per type',
+    'Cross border flows'
+];
+
+function quantityTypeToString(type: QuantityType): String {
+    if (type == QuantityType.actualTotalLoad) return quantityTypesLabels[0];
+    if (type == QuantityType.generationPerType) return quantityTypesLabels[1];
+    if (type == QuantityType.crossBorderFlows) return quantityTypesLabels[2];
+    return 'could not map quantity type';
+}
+
+function mapStringToQuantityType(text: String): QuantityType {
+    if (text === quantityTypesLabels[0]) return QuantityType.actualTotalLoad;
+    if (text === quantityTypesLabels[1]) return QuantityType.generationPerType;
+    if (text === quantityTypesLabels[2]) return QuantityType.crossBorderFlows;
+    return QuantityType.actualTotalLoad;
+}
+
 export type DropDownGroupProps = {
-    onChange: (state: DropDownGroupState) => void;
+    onChange: (state: DropDownChangeListener) => void;
 };
 export default function DropDownGroup(props: DropDownGroupProps) {
-    const actualTotalLoad = 'Actual total load';
-    const generationPerType = 'Generation per type';
-    const crossBorderFlows = 'Cross border flows';
+    const service: EnergyService = new MockDataService();
 
     const defaultOption = 'Select option';
     const initialState : DropDownGroupState = {
-        quantity: actualTotalLoad,
+        quantity: QuantityType.actualTotalLoad,
         secondSelection: defaultOption,
         thirdSelection: defaultOption,
+        secondOptions: [],
+        thirdOptions: [],
+        secondSelectionTitle: 'Country',
+        thirdSelectionTitle: '', 
     }
-    const [state, setState] = useState(initialState);
-
+    const [state, setState] = useState(initialState); 
 
     // this hook will get called everytime when state has changed
     useEffect(() => {
-        console.log('Updated State', state);
+        // console.log('Updated State', state);
         props.onChange(state);
     }, [state]);
 
+    useEffect(() => {
+        const setOptions = async () => {
+            switch (state.quantity) {
+                case QuantityType.actualTotalLoad:
+                    setState({
+                        ...state,
+                        secondSelectionTitle: 'Country',
+                        thirdSelectionTitle: '',
+                        secondOptions: await service.fetchCountries()
+                    });
+                    break;
+                case QuantityType.generationPerType:
+                    setState({
+                        ...state,
+                        secondSelectionTitle: 'Country',
+                        thirdSelectionTitle: 'Generation type',
+                        secondOptions: await service.fetchCountries(),
+                        thirdOptions: await service.fetchGenerationPerTypeOptions()
+                    });
+                    break;
+                case QuantityType.crossBorderFlows:
+                    setState({
+                        ...state,
+                        secondSelectionTitle: 'Country(from)',
+                        thirdSelectionTitle: 'Country(to)',
+                        secondOptions: await service.fetchCountries(),
+                        thirdOptions: await service.fetchCountries()
+                    });
+                    break;
+            }
+        }
 
-    var firstSelectionTitle = 'Quantity';
-    var secondSelectionTitle = 'Country';
-    var thirdSelectionTitle = '';
-    switch (state.quantity) {
-        case actualTotalLoad:
-            secondSelectionTitle = 'Country';
-            break;
-        case generationPerType:
-            secondSelectionTitle = 'Country';
-            thirdSelectionTitle = 'Generation type';
-            break;
-        case crossBorderFlows:
-            secondSelectionTitle = 'Country(from)';
-            thirdSelectionTitle = 'Country(to)';
-            break;
-    }
+        setOptions();
+    }, [state.quantity]);
 
-    const firstSelectionOptions = ['Actual total load', 'Generation per type', 'Cross border flaws'];
-
-    const showThirdSelection = state.quantity !== actualTotalLoad;
+    const showThirdSelection = state.quantity !== QuantityType.actualTotalLoad;
 
     return (
         <>
             <DropDown
-                title={firstSelectionTitle}
-                options={firstSelectionOptions}
-                selectedValue={state.quantity}
+                title='Quantity'
+                options={quantityTypesLabels}
+                selectedValue={quantityTypeToString(state.quantity)}
                 onSelected={(selection: String) => {
-                    setState({...state, quantity: selection});
+                    setState({...state, quantity: mapStringToQuantityType(selection)});
                 }}
             />
             <div className='py-2'/>
             <DropDown
-                title={secondSelectionTitle}
-                options={['Greece', 'Cyprus', 'Germany']}
+                title={state.secondSelectionTitle}
+                options={state.secondOptions}
                 selectedValue={state.secondSelection}
                 onSelected={(selection: String) => {
                     setState({...state, secondSelection: selection});
@@ -75,8 +126,8 @@ export default function DropDownGroup(props: DropDownGroupProps) {
             <div className='py-2'/>
             {showThirdSelection ?
             <DropDown
-                title={thirdSelectionTitle}
-                options={['Natural gas', 'Petrol']}
+                title={state.thirdSelectionTitle}
+                options={state.thirdOptions}
                 selectedValue={state.thirdSelection}
                 onSelected={(selection: String) => {
                     setState({...state, thirdSelection: selection});
