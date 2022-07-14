@@ -69,14 +69,14 @@ def find_diffs(data_prev, data_new):
     i, j = 0, 0
     length = len(new)
     length_prev = len(prev)
-    diffs = []
+    insertions, updates = [], []
     while(i < length):
         if j>=length_prev:
-            diffs += new[i:]
+            insertions += new[i:]
             break
         # datetime comparison
         if(new[i][0] < prev[j][0]):
-            diffs.append(new[i])
+            insertions.append(new[i])
             i += 1
             continue
         if(new[i][0] > prev[j][0]):
@@ -85,7 +85,7 @@ def find_diffs(data_prev, data_new):
 
         # mapCode comparison
         if(new[i][1] < prev[j][1]):
-            diffs.append(new[i])
+            insertions.append(new[i])
             i += 1
             continue
         if(new[i][1] > prev[j][1]):
@@ -103,7 +103,7 @@ def find_diffs(data_prev, data_new):
 
         # regarding update time - keep the newer one
         if(new[i][4] > prev[j][4]):
-            diffs.append(new[i])
+            updates.append(new[i])
             i += 1
             j += 1
             continue
@@ -112,4 +112,4 @@ def find_diffs(data_prev, data_new):
             j += 1
             continue
     
-    return diffs
+    return insertions, updates
