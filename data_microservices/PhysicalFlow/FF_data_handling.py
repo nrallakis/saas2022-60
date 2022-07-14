@@ -1,6 +1,7 @@
 import sys
 sys.path.append("../Shared")
 from utils import *
+import json
 
 
 def filterData(csvData, latestDateTime):
@@ -113,3 +114,22 @@ def find_diffs(data_prev, data_new):
             continue
     
     return insertions, updates
+
+    
+def dict_data(insertions, updates):
+    ins_list, upd_list = [], []
+    for i in insertions:
+        ins = {"dateTime" :i[0].strftime("%Y-%m-%d %H:%M:%S.000"), "outMapCode":i[1], "inMapCode":i[2], "flowValue":i[3], \
+            "updateTime":i[4].strftime("%Y-%m-%d %H:%M:%S.000")}
+        ins_list.append(ins)
+    for i in updates:
+        upd = {"dateTime" :i[0].strftime("%Y-%m-%d %H:%M:%S.000"), "outMapCode":i[1], "inMapCode":i[2], "flowValue":i[3], \
+            "updateTime":i[4].strftime("%Y-%m-%d %H:%M:%S.000")}
+        upd_list.append(upd)
+
+    dict = {'type':'ATL', 'insertions':ins_list, 'updates': upd_list}
+    return dict
+
+def json_data(insertions, updates):
+    dictionary = dict_data(insertions, updates)
+    return json.dumps(dictionary)
