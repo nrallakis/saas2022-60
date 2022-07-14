@@ -1,11 +1,11 @@
 import Header from "../components/header";
-import DatePicker from "../components/date_picker";
 import DropDownGroup, {DropDownChangeListener, QuantityType} from "../components/drop_down_group";
 import {useEffect, useState} from "react";
 import {Points} from "../data/point";
 import {EnergyService, MockDataService} from "../data/energy_service";
 import {Button} from "react-bootstrap";
 import {Chart} from "../components/chart";
+import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 
 interface DashboardState {
     loading: Boolean;
@@ -37,13 +37,15 @@ function DashboardPage() {
         console.log(state);
     }, [state]);
 
-    function onDateChange(dateFrom: Date, dateTo?: Date) {
-        dateTo ??= new Date();
+    function onDateChange(dates: any) {
+        let [start, end] = dates;
         setState({
             ...state,
-            dateFrom: dateFrom,
-            dateTo: dateTo,
+            dateFrom: start,
+            dateTo: end,
         })
+        console.log(start);
+        console.log(end);
     }
 
     function onDropDownChange(dropDownSelections: DropDownChangeListener) {
@@ -58,30 +60,26 @@ function DashboardPage() {
         const quantity = state.dropDownSelections?.quantity;
         const dateStart = state.dateFrom!;
         const dateEnd = state.dateTo!;
-        switch (quantity) {
-            case QuantityType.actualTotalLoad:
-                var country = state.dropDownSelections?.secondSelection!;
-                setState({
-                    ...state,
-                    data: await service.fetchActualTotalLoad(country, dateStart, dateEnd)
-                });
-                break;
-            case QuantityType.generationPerType:
-                country = state.dropDownSelections?.secondSelection!;
-                const generationType = state.dropDownSelections?.thirdSelection!;
-                setState({
-                    ...state,
-                    data: await service.fetchGenerationPerType(country, generationType, dateStart, dateEnd)
-                });
-                break;
-            case QuantityType.crossBorderFlows:
-                const countryFrom = state.dropDownSelections?.secondSelection!;
-                const countryTo = state.dropDownSelections?.thirdSelection!;
-                setState({
-                    ...state,
-                    data: await service.fetchCrossBorderFlows(countryFrom, countryTo, dateStart, dateEnd)
-                });
-                break;
+        if (quantity == QuantityType.actualTotalLoad) {
+            let country = state.dropDownSelections?.secondSelection!;
+            setState({
+                ...state,
+                data: await service.fetchActualTotalLoad(country, dateStart, dateEnd)
+            });
+        } else if (quantity == QuantityType.generationPerType) {
+            let country = state.dropDownSelections?.secondSelection!;
+            const generationType = state.dropDownSelections?.thirdSelection!;
+            setState({
+                ...state,
+                data: await service.fetchGenerationPerType(country, generationType, dateStart, dateEnd)
+            });
+        } else if (quantity == QuantityType.crossBorderFlows) {
+            const countryFrom = state.dropDownSelections?.secondSelection!;
+            const countryTo = state.dropDownSelections?.thirdSelection!;
+            setState({
+                ...state,
+                data: await service.fetchCrossBorderFlows(countryFrom, countryTo, dateStart, dateEnd)
+            });
         }
         //setState({...state, loading: false});
     }
@@ -91,13 +89,15 @@ function DashboardPage() {
             <Header/>
             <div className="container pt-4">
                 <div className="row">
-                    <div className="col" >
-                        <DatePicker onChange={onDateChange}/>
+                    <div className="col-4" >
+                        <h5>Date range</h5>
+                        <DateRangePicker onChange={onDateChange} format="dd-MM-y" value={[state.dateFrom ?? new Date(), state.dateTo ?? new Date()]} />
+                        <div className="pt-3" />
                         <DropDownGroup onChange={onDropDownChange} />
                         <div className="pt-3" />
                         <Button onClick={onFilterClicked}>Filter</Button>
                     </div>
-                    <div className="col" >
+                    <div className="col-8" >
                         <Chart data={state.data!} />
                     </div>
                 </div>
