@@ -14,7 +14,7 @@ services:
     container_name: energyLiveDataDB
     restart: always
     volumes:
-      - ./data microservice/database/db.sql:/docker-entrypoint-initdb.d/dump.sql
+      - ./data_microservices/Shared/database/db.sql:/docker-entrypoint-initdb.d/dump.sql
     ports:
       - 3306:3306
     environment:
