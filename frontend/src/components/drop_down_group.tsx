@@ -1,22 +1,22 @@
 import {Dropdown} from 'react-bootstrap';
 import {useState, useEffect} from 'react';
 import DropdownButton from 'react-bootstrap/DropdownButton'
-import { EnergyService, MockDataService } from '../data/energy_service';
+import { DataService, EnergyService } from '../data/energy_service';
 
 export interface DropDownGroupState {
     quantity: QuantityType;
-    secondSelection: String;
-    thirdSelection: String;
-    secondOptions: String[];
-    thirdOptions: String[];
-    secondSelectionTitle: String,
-    thirdSelectionTitle: String,
+    secondSelection: string;
+    thirdSelection: string;
+    secondOptions: string[];
+    thirdOptions: string[];
+    secondSelectionTitle: string,
+    thirdSelectionTitle: string,
 }
 
 export interface DropDownChangeListener {
     quantity: QuantityType;
-    secondSelection: String;
-    thirdSelection: String;
+    secondSelection: string;
+    thirdSelection: string;
 }
 
 export enum QuantityType {
@@ -29,14 +29,14 @@ const quantityTypesLabels = [
     'Cross border flows'
 ];
 
-function quantityTypeToString(type: QuantityType): String {
+function quantityTypeToString(type: QuantityType): string {
     if (type == QuantityType.actualTotalLoad) return quantityTypesLabels[0];
     if (type == QuantityType.generationPerType) return quantityTypesLabels[1];
     if (type == QuantityType.crossBorderFlows) return quantityTypesLabels[2];
     return 'could not map quantity type';
 }
 
-function mapStringToQuantityType(text: String): QuantityType {
+function mapStringToQuantityType(text: string): QuantityType {
     if (text === quantityTypesLabels[0]) return QuantityType.actualTotalLoad;
     if (text === quantityTypesLabels[1]) return QuantityType.generationPerType;
     if (text === quantityTypesLabels[2]) return QuantityType.crossBorderFlows;
@@ -47,7 +47,7 @@ export type DropDownGroupProps = {
     onChange: (state: DropDownChangeListener) => void;
 };
 export default function DropDownGroup(props: DropDownGroupProps) {
-    const service: EnergyService = new MockDataService();
+    const service: EnergyService = new DataService();
 
     const defaultOption = 'Select option';
     const initialState : DropDownGroupState = {
@@ -110,7 +110,7 @@ export default function DropDownGroup(props: DropDownGroupProps) {
                 title='Quantity'
                 options={quantityTypesLabels}
                 selectedValue={quantityTypeToString(state.quantity)}
-                onSelected={(selection: String) => {
+                onSelected={(selection: string) => {
                     setState({...state, quantity: mapStringToQuantityType(selection)});
                 }}
             />
@@ -119,7 +119,7 @@ export default function DropDownGroup(props: DropDownGroupProps) {
                 title={state.secondSelectionTitle}
                 options={state.secondOptions}
                 selectedValue={state.secondSelection}
-                onSelected={(selection: String) => {
+                onSelected={(selection: string) => {
                     setState({...state, secondSelection: selection});
                 }}
             />
@@ -129,7 +129,7 @@ export default function DropDownGroup(props: DropDownGroupProps) {
                 title={state.thirdSelectionTitle}
                 options={state.thirdOptions}
                 selectedValue={state.thirdSelection}
-                onSelected={(selection: String) => {
+                onSelected={(selection: string) => {
                     setState({...state, thirdSelection: selection});
                 }}
             /> : null }
