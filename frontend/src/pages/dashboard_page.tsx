@@ -2,7 +2,7 @@ import Header from "../components/header";
 import DropDownGroup, {DropDownChangeListener, QuantityType} from "../components/drop_down_group";
 import {useEffect, useState} from "react";
 import {Points} from "../data/point";
-import {EnergyService, MockDataService} from "../data/energy_service";
+import {DataService, EnergyService} from "../data/energy_service";
 import {Button} from "react-bootstrap";
 import {Chart} from "../components/chart";
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
@@ -16,7 +16,7 @@ interface DashboardState {
 }
 
 function DashboardPage() {
-    let service: EnergyService = new MockDataService();
+    let service: EnergyService = new DataService();
 
     //TODO: connect to websocket to listen to updates
     //TODO: onDataUpdate(): if data == the same with the filtered, refresh
