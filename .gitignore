@@ -6,3 +6,4 @@ package-lock.json
 .idea
 *.csv
 architecture/*.vpp.bak*
+data microservices/**/__pycache__
