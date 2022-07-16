@@ -1,12 +1,12 @@
 FROM node:alpine
 
-WORKDIR /frontend
+WORKDIR /app
 
-COPY package.json /frontend/
+COPY package.json ./
 
 RUN npm install
 
-COPY . /frontend/
+COPY . ./
 
 ENV PORT=3000
 
