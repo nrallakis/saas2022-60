@@ -12,16 +12,16 @@ const fakeData = [[1167609600000,0.7537],[1167696000000,0.7537],[1167782400000,0
 
 export class DataService implements EnergyService {
     fetchActualTotalLoad(country: String, start: Date, end: Date): Promise<Points> {
-        return Promise.resolve([]);
+        return fetch(`/atl/${country}?from=${start}&to=${end}`).then(res => res.json());
     }
     fetchGenerationPerType(country: String, generationType: String, start: Date, end: Date): Promise<Points> {
-        return Promise.resolve([]);
+        return fetch(`/gpt/${generationType}/${country}?from=${start}&to=${end}`).then(res => res.json());
     }
     fetchCrossBorderFlows(countryFrom: String, countryTo: String,  start: Date, end: Date): Promise<Points> {
-        return Promise.resolve([]);
+        return fetch(`/ff/${countryFrom}/${countryTo}?from=${start}&to=${end}`).then(res => res.json());
     }
     fetchCountries(): Promise<String[]> {
-        return Promise.resolve([]);
+        return fetch('/countries/').then(res => res.json());
     }
     fetchGenerationPerTypeOptions(): Promise<String[]> {
         throw new Error("Method not implemented.");
