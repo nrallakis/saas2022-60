@@ -21,11 +21,11 @@ def filterData(csvData, latestDateTime):
         dateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
         mapCode = rowData[5]
         totalLoadValue = rowData[6]
-        updateTime = datetime.strptime(rowData[7], "%Y-%m-%d %H:%M:%S.000")
+        updateTime = datetime.strptime(rowData[7], "%Y-%m-%d %H:%M:%S")
         data.append((dateTime, mapCode, totalLoadValue, updateTime))
 
     data.sort(key=sortByDate)
-    data = keepDataAfter(data, latestDateTime)
+    # data = keepDataAfter(data, latestDateTime)
     return data
 
 
