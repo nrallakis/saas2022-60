@@ -6,8 +6,8 @@ export class AtlController {
   constructor(private readonly atlService: AtlService) {}
 
   @Get()
-  findAll() {
-    return 'Service running';
+  async findAll(): Promise<void> {
+    return this.atlService.findAll();
   }
 
   @Get(':country')
