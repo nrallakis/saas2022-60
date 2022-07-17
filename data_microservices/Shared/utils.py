@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 from sqlalchemy.dialects.mysql import mariadb
 from datetime import datetime, timedelta
+# from kafka import KafkaProducer
+import json
 
 def loadAndFilterData(filePath, dataFilter):
     latestDateTime = extractDateFromFileName(filePath)
@@ -57,6 +59,14 @@ def connectToDatabase(databaseName):
     )
     cursor = mydb.cursor()
     return mydb, cursor
+
+def sendToKafka(jsonMessage, topicName, hostname):
+    # setup the Producer object
+    producer = KafkaProducer(bootstrap_servers=f'{hostname}:9092',
+                             value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+    producer.send(topic=topicName, value=jsonMessage)
+    producer.flush() 
+    # 'kafka' instead of 'localhost' if inside a container stack 
 
 
 def csv_path(starting_date, file_ext_type="AggregatedGenerationPerType16.1.BC.csv", time_interval=(0,0,1)):

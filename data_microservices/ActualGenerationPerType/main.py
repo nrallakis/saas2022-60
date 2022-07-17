@@ -14,9 +14,9 @@ if __name__ == "__main__":
     _, new_csv = csv_path(starting_date=sys.argv[1], file_ext_type="AggregatedGenerationPerType16.1.BC.csv", time_interval=(0,0,1))
     data_prev = loadAndFilterData(old_csv, dataFilter=agpt.filterData)
     data_new = loadAndFilterData(new_csv, dataFilter=agpt.filterData)
-    ins, upd = find_diffs(data_prev, data_new)
+    ins, upd = agpt.find_diffs(data_prev, data_new)
 
-    json = json_data(ins, upd)
+    json = agpt.json_data(ins, upd)
     print(json)
 
     

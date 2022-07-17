@@ -21,17 +21,17 @@ def filterData(csv_data, latestDateTime):
         if areaTypeCode != 'CTY':
             continue
 
-        dateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S")
+        dateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
         mapCode = rowData[5]
         productionType = rowData[6]
         actualGenerationOutput = rowData[7]
         actualConsumption = rowData[8]
-        updateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S")
+        updateTime = datetime.strptime(rowData[9], "%Y-%m-%d %H:%M:%S")
         data.append((dateTime, mapCode, productionType,
                     actualGenerationOutput, actualConsumption, updateTime))
 
     data.sort(key=sortByDate)
-    data = keepDataAfter(data, latestDateTime)
+    #data = keepDataAfter(data, latestDateTime)
     return data
 
 
