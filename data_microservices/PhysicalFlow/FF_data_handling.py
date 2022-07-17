@@ -127,7 +127,7 @@ def dict_data(insertions, updates):
             "updateTime":i[4].strftime("%Y-%m-%d %H:%M:%S.000")}
         upd_list.append(upd)
 
-    dict = {'type':'ATL', 'insertions':ins_list, 'updates': upd_list}
+    dict = {'type':'FF', 'insertions':ins_list, 'updates': upd_list}
     return dict
 
 def json_data(insertions, updates):

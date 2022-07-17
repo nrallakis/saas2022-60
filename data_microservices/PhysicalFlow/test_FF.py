@@ -34,7 +34,7 @@ class TestUtils(unittest.TestCase):
     
     def test_json_data(self):
         ins, upd = [(datetime(2022,1,31), 'AB', 'AB', 100, datetime(2022,1,31,1,1,1)), (datetime(2028,1,31), 'BE', 'BE', 200, datetime(2023,1,31,1,1,1))], []
-        expected = '{"type": "ATL", "insertions": [{"dateTime": "2022-01-31 00:00:00.000", "outMapCode": "AB", "inMapCode": "AB", "flowValue": 100, "updateTime": "2022-01-31 01:01:01.000"}, {"dateTime": "2028-01-31 00:00:00.000", "outMapCode": "BE", "inMapCode": "BE", "flowValue": 200, "updateTime": "2023-01-31 01:01:01.000"}], "updates": []}'
+        expected = '{"type": "FF", "insertions": [{"dateTime": "2022-01-31 00:00:00.000", "outMapCode": "AB", "inMapCode": "AB", "flowValue": 100, "updateTime": "2022-01-31 01:01:01.000"}, {"dateTime": "2028-01-31 00:00:00.000", "outMapCode": "BE", "inMapCode": "BE", "flowValue": 200, "updateTime": "2023-01-31 01:01:01.000"}], "updates": []}'
         actual = json_data(ins, upd)
         self.maxDiff = None
         self.assertEqual(actual, expected)
