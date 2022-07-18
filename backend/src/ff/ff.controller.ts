@@ -8,15 +8,15 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { AtlService } from './atl.service';
+import { FFService } from './ff.service';
 
 @Controller('atl')
-export class AtlController {
-  constructor(private readonly atlService: AtlService) {}
+export class FFController {
+  constructor(private readonly ffService: FFService) {}
 
   @Get()
   async findAll(): Promise<void> {
-    return this.atlService.add();
+    return this.ffService.add();
   }
 
   @Get(':country')
@@ -25,7 +25,7 @@ export class AtlController {
     @Query('from') dateFrom: Date,
     @Query('to') dateTo: Date,
   ) {
-    return this.atlService.getDataForCountry(
+    return this.ffService.getDataForCountry(
       country,
       new Date(dateFrom),
       new Date(dateTo),

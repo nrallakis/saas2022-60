@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ActualTotalLoad, ActualTotalLoadDocument } from './atl.schema';
+import { PhysicalFlows, PhysicalFlowsDocument } from './ff.schema';
 
 @Injectable()
-export class AtlService {
+export class FFService {
   constructor(
-    @InjectModel(ActualTotalLoad.name)
-    private readonly atlModel: Model<ActualTotalLoadDocument>,
+    @InjectModel(PhysicalFlows.name)
+    private readonly atlModel: Model<PhysicalFlowsDocument>,
   ) {}
 
   async add(): Promise<void> {

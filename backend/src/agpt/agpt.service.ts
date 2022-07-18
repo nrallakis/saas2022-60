@@ -1,21 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ActualTotalLoad, ActualTotalLoadDocument } from './atl.schema';
+import {
+  ActualGenerationPerType,
+  ActualGenerationPerTypeDocument,
+} from './agpt.schema';
 
 @Injectable()
-export class AtlService {
+export class AgptService {
   constructor(
-    @InjectModel(ActualTotalLoad.name)
-    private readonly atlModel: Model<ActualTotalLoadDocument>,
+    @InjectModel(ActualGenerationPerType.name)
+    private readonly agptModel: Model<ActualGenerationPerTypeDocument>,
   ) {}
 
   async add(): Promise<void> {
-    await this.atlModel.create({
+    await this.agptModel.create({
       dateTime: new Date('2021-05-20T10:24:51.303Z'),
-      mapCode: 'AB',
-      actualTotalLoad: 100,
-      updateTime: new Date('2022-01-31 01:01:01.000'),
+      mapCode: 'BE',
+      productionType: 'BE',
+      actualGenerationOutput: 100,
+      actualConsumption: 100,
+      updateTime: '2022-01-31 01:01:01.000',
     });
   }
 
@@ -47,6 +52,6 @@ export class AtlService {
       [1169769600000, 0.7752],
       [1170028800000, 0.774],
     ];
-    return fakeData;
+    return fakeData.reverse();
   }
 }
