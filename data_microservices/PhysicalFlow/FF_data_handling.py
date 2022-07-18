@@ -18,11 +18,11 @@ def filterData(csvData, latestDateTime):
         outMapCode = rowData[5]
         inMapCode = rowData[9]
         flowValue = rowData[10]
-        updateTime = datetime.strptime(rowData[9], "%Y-%m-%d %H:%M:%S.000")
+        updateTime = datetime.strptime(rowData[11], "%Y-%m-%d %H:%M:%S")
         data.append((dateTime, outMapCode, inMapCode, flowValue, updateTime))
 
     data.sort(key=sortByDate)
-    data = keepDataAfter(data, latestDateTime)
+    # data = keepDataAfter(data, latestDateTime)
     return data
 
 

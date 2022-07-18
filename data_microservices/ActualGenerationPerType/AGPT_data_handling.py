@@ -26,12 +26,12 @@ def filterData(csv_data, latestDateTime):
         productionType = rowData[6]
         actualGenerationOutput = rowData[7]
         actualConsumption = rowData[8]
-        updateTime = datetime.strptime(rowData[0], "%Y-%m-%d %H:%M:%S.000")
+        updateTime = datetime.strptime(rowData[9], "%Y-%m-%d %H:%M:%S")
         data.append((dateTime, mapCode, productionType,
                     actualGenerationOutput, actualConsumption, updateTime))
 
     data.sort(key=sortByDate)
-    data = keepDataAfter(data, latestDateTime)
+    #data = keepDataAfter(data, latestDateTime)
     return data
 
 
