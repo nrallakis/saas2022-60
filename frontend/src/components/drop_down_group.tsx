@@ -2,6 +2,7 @@ import {Dropdown} from 'react-bootstrap';
 import {useState, useEffect} from 'react';
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import { DataService, EnergyService } from '../data/energy_service';
+import {mapCodeToCountry} from "../countries";
 
 export interface DropDownGroupState {
     quantity: QuantityType;
@@ -71,29 +72,35 @@ export default function DropDownGroup(props: DropDownGroupProps) {
         const setOptions = async () => {
             switch (state.quantity) {
                 case QuantityType.actualTotalLoad:
+                    let countryCodes = await service.fetchActualTotalLoadCountries()
+                    let countries = countryCodes.map((code) => mapCodeToCountry(code));
                     setState({
                         ...state,
                         secondSelectionTitle: 'Country',
                         thirdSelectionTitle: '',
-                        secondOptions: await service.fetchCountries()
+                        secondOptions: countries
                     });
                     break;
                 case QuantityType.generationPerType:
+                    countryCodes = await service.fetchGenerationPerTypeCountries()
+                    countries = countryCodes.map((code) => mapCodeToCountry(code));
                     setState({
                         ...state,
                         secondSelectionTitle: 'Country',
                         thirdSelectionTitle: 'Generation type',
-                        secondOptions: await service.fetchCountries(),
+                        secondOptions: countries,
                         thirdOptions: await service.fetchGenerationPerTypeOptions()
                     });
                     break;
                 case QuantityType.crossBorderFlows:
+                    countryCodes = await service.fetchCrossBorderFlowsCountries()
+                    countries = countryCodes.map((code) => mapCodeToCountry(code));
                     setState({
                         ...state,
                         secondSelectionTitle: 'Country(from)',
                         thirdSelectionTitle: 'Country(to)',
-                        secondOptions: await service.fetchCountries(),
-                        thirdOptions: await service.fetchCountries()
+                        secondOptions: countries,
+                        thirdOptions: countries,
                     });
                     break;
             }

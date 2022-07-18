@@ -1,10 +1,12 @@
 import {Points} from "./point";
 
 export interface EnergyService {
-    fetchActualTotalLoad(country: string, start: Date, end: Date): Promise<Points>
-    fetchGenerationPerType(country: string, generationType: string, start: Date, end: Date): Promise<Points>
-    fetchCrossBorderFlows(countryFrom: string, countryTo: string,  start: Date, end: Date): Promise<Points>
-    fetchCountries(): Promise<string[]>
+    fetchActualTotalLoad(countryCode: string, start: Date, end: Date): Promise<Points>
+    fetchActualTotalLoadCountries(): Promise<string[]>
+    fetchGenerationPerType(countryCode: string, generationType: string, start: Date, end: Date): Promise<Points>
+    fetchGenerationPerTypeCountries(): Promise<string[]>
+    fetchCrossBorderFlows(countryCodeFrom: string, countryCodeTo: string,  start: Date, end: Date): Promise<Points>
+    fetchCrossBorderFlowsCountries(): Promise<string[]>
     fetchGenerationPerTypeOptions(): Promise<string[]>
 }
 
@@ -16,14 +18,20 @@ export class DataService implements EnergyService {
     fetchActualTotalLoad(country: string, start: Date, end: Date): Promise<Points> {
         return fetch(`${baseUrl}/atl/${country}?from=${start}&to=${end}`).then(res => res.json());
     }
+    fetchActualTotalLoadCountries(): Promise<string[]> {
+        return fetch(`${baseUrl}/atl/countries/`).then(res => res.json());
+    }
     fetchGenerationPerType(country: string, generationType: string, start: Date, end: Date): Promise<Points> {
-        return fetch(`${baseUrl}/gpt/${generationType}/${country}?from=${start}&to=${end}`).then(res => res.json());
+        return fetch(`${baseUrl}/agpt/${generationType}/${country}?from=${start}&to=${end}`).then(res => res.json());
+    }
+    fetchGenerationPerTypeCountries(): Promise<string[]> {
+        return fetch(`${baseUrl}/agpt/countries/`).then(res => res.json());
     }
     fetchCrossBorderFlows(countryFrom: string, countryTo: string,  start: Date, end: Date): Promise<Points> {
         return fetch(`${baseUrl}/ff/${countryFrom}/${countryTo}?from=${start}&to=${end}`).then(res => res.json());
     }
-    fetchCountries(): Promise<string[]> {
-        return fetch(`${baseUrl}/countries/`).then(res => res.json());
+    fetchCrossBorderFlowsCountries(): Promise<string[]> {
+        return fetch(`${baseUrl}/ff/countries/`).then(res => res.json());
     }
     fetchGenerationPerTypeOptions(): Promise<string[]> {
         return fetch(`${baseUrl}/gptOptions/`).then(res => res.json());
@@ -31,6 +39,15 @@ export class DataService implements EnergyService {
 }
 
 export class MockDataService implements EnergyService {
+    fetchActualTotalLoadCountries(): Promise<string[]> {
+        throw new Error("Method not implemented.");
+    }
+    fetchGenerationPerTypeCountries(): Promise<string[]> {
+        throw new Error("Method not implemented.");
+    }
+    fetchCrossBorderFlowsCountries(): Promise<string[]> {
+        throw new Error("Method not implemented.");
+    }
     fetchActualTotalLoad(country: string, start: Date, end: Date): Promise<Points> {
         return Promise.resolve(fakeData);
     }
@@ -39,16 +56,6 @@ export class MockDataService implements EnergyService {
     }
     fetchCrossBorderFlows(countryFrom: string, countryTo: string,  start: Date, end: Date): Promise<Points> {
         return Promise.resolve(fakeData);
-    }
-    fetchCountries(): Promise<string[]> {
-        return Promise.resolve([
-            'Greece',
-            'Germany',
-            'Italy',
-            'Sweden',
-            'Bulgary',
-            'Austria'
-        ]);
     }
     fetchGenerationPerTypeOptions(): Promise<string[]> {
         return Promise.resolve(['Gas', 'Petrol', 'Wind']);
