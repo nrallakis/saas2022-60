@@ -1,44 +1,78 @@
-import { ActualGenerationPerType } from "src/agpt/agpt.schema";
-import { ActualTotalLoad } from "src/atl/atl.schema";
-import { PhysicalFlows } from "src/ff/ff.schema";
+import { ActualGenerationPerType } from "../agpt/agpt.schema";
+import { PhysicalFlows } from "../ff/ff.schema";
+import { ActualTotalLoad } from "../atl/atl.schema";
 
-interface KafkaDateMessage {
+
+export interface KafkaDataMessage {
   type: string;
-  insertions: ActualTotalLoad[] | ActualGenerationPerType[] | PhysicalFlows[];
-  updates: ActualTotalLoad[] | ActualGenerationPerType[] | PhysicalFlows[];
+  insertions: any;
+  updates: any;
 }
 
-function kafkaToActualTotalLoad(message: KafkaDateMessage): ActualTotalLoad {
-  //TODO: implement and test
-  return {
-    dateTime: new Date("2021-05-20T10:24:51.303Z"),
-    mapCode: "AB",
-    actualDataLoad: 100,
-    updateTime: new Date("2022-01-31 01:01:01.000")
-  };
+function parseActualTotalLoadJson(json: any): ActualTotalLoad {
+  return new ActualTotalLoad(
+    new Date(json.dateTime),
+    json.mapCode,
+    Number(json.actualTotalLoad),
+    new Date(json.updateTime)
+  );
 }
 
-function kafkaToActualGenerationPerType(
-  message: KafkaDateMessage
-): ActualGenerationPerType {
-  //TODO: implement and test
-  return {
-    dateTime: new Date("2021-05-20T10:24:51.303Z"),
-    mapCode: "BE",
-    productionType: "BE",
-    actualGenerationOutput: 100,
-    actualConsumption: 100,
-    updateTime: new Date("2022-01-31 01:01:01.000")
-  };
+export function kafkaToActualTotalLoad(message: KafkaDataMessage): [ActualTotalLoad[], ActualTotalLoad[]] {
+  let insertions = message.insertions.map(
+    (insert) => parseActualTotalLoadJson(insert)
+  );
+
+  let updates = message.updates.map(
+    (update) => parseActualTotalLoadJson(update)
+  );
+
+  return [insertions, updates];
 }
 
-function kafkaToPhysicalFlows(message: KafkaDateMessage): PhysicalFlows {
-  //TODO: implement and test
-  return {
-    dateTime: new Date("2021-05-20T10:24:51.303Z"),
-    outMapCode: "AB",
-    inMapCode: "AB",
-    flowValue: 100,
-    updateTime: new Date("2022-01-31 01:01:01.000")
-  };
+function parseActualGenerationPerTypeJson(json: any): ActualGenerationPerType {
+  return new ActualGenerationPerType(
+    new Date(json.dateTime),
+    json.mapCode,
+    json.productionType,
+    Number(json.actualGenerationOutput),
+    Number(json.actualConsumption),
+    new Date(json.updateTime)
+  );
+}
+
+export function kafkaToActualGenerationPerType(
+  message: KafkaDataMessage
+): [ActualGenerationPerType[], ActualGenerationPerType[]] {
+  let insertions = message.insertions.map(
+    (insert) => parseActualGenerationPerTypeJson(insert)
+  );
+
+  let updates = message.updates.map(
+    (update) => parseActualGenerationPerTypeJson(update)
+  );
+
+  return [insertions, updates];
+}
+
+function parsePhysicalFlowsJson(json: any): PhysicalFlows  {
+  return new PhysicalFlows(
+    new Date(json.dateTime),
+    json.outMapCode,
+    json.inMapCode,
+    Number(json.flowValue),
+    new Date(json.updateTime)
+  );
+}
+
+export function kafkaToPhysicalFlows(message: KafkaDataMessage): [PhysicalFlows[], PhysicalFlows[]] {
+  let insertions = message.insertions.map(
+    (insert) => parsePhysicalFlowsJson(insert)
+  );
+
+  let updates = message.updates.map(
+    (update) => parsePhysicalFlowsJson(update)
+  );
+
+  return [insertions, updates];
 }

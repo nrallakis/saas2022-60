@@ -6,6 +6,8 @@ import { AtlModule } from './atl/atl.module';
 import { KafkaModule } from './kafka/kafka.module';
 import { AgptModule } from './agpt/agpt.module';
 import { FFModule } from './ff/ff.module';
+import { ConsumerRunner } from "./kafka.runner";
+import { ActualTotalLoad } from "./atl/atl.schema";
 
 @Module({
   imports: [
@@ -16,6 +18,6 @@ import { FFModule } from './ff/ff.module';
     AgptModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ConsumerRunner],
 })
 export class AppModule {}

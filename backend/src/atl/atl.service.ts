@@ -11,12 +11,13 @@ export class AtlService {
   ) {}
 
   async add(): Promise<void> {
-    await this.atlModel.create({
+    let fakeData: ActualTotalLoad = {
       dateTime: new Date('2021-05-20T10:24:51.303Z'),
       mapCode: 'AB',
-      actualTotalLoad: 100,
+      actualDataLoad: 100,
       updateTime: new Date('2022-01-31 01:01:01.000'),
-    });
+    };
+    await this.atlModel.create(fakeData);
   }
 
   async getDataForCountry(
@@ -24,6 +25,12 @@ export class AtlService {
     dateFrom: Date,
     dateTo: Date,
   ): Promise<number[][]> {
+    this.atlModel.find({
+      dateTime: {
+        "$gt": dateFrom,
+        "$lt": dateTo,
+      }
+    });
     const fakeData = [
       [1167609600000, 0.7537],
       [1167696000000, 0.7537],

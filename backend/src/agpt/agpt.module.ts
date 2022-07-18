@@ -18,5 +18,13 @@ import {
   ],
   controllers: [AgptController],
   providers: [AgptService],
+  exports: [
+    MongooseModule.forFeature([
+      {
+        name: ActualGenerationPerType.name,
+        schema: ActualGenerationPerTypeSchema,
+      },
+    ]),
+  ],
 })
 export class AgptModule {}

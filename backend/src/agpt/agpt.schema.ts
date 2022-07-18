@@ -23,6 +23,15 @@ export class ActualGenerationPerType {
 
   @Prop()
   updateTime: Date;
+
+  constructor(dateTime: Date, mapCode: string, productionType: string, actualGenerationOutput: number, actualConsumption: number, updateTime: Date) {
+    this.dateTime = dateTime;
+    this.mapCode = mapCode;
+    this.productionType = productionType;
+    this.actualGenerationOutput = actualGenerationOutput;
+    this.actualConsumption = actualConsumption;
+    this.updateTime = updateTime;
+  }
 }
 
 export const ActualGenerationPerTypeSchema = SchemaFactory.createForClass(

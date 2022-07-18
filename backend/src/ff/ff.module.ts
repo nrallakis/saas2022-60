@@ -12,5 +12,10 @@ import { FFService } from './ff.service';
   ],
   controllers: [FFController],
   providers: [FFService],
+  exports: [
+    MongooseModule.forFeature([
+      { name: PhysicalFlows.name, schema: PhysicalFlowsSchema },
+    ]),
+  ]
 })
 export class FFModule {}

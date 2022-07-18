@@ -16,6 +16,13 @@ export class ActualTotalLoad {
 
   @Prop()
   updateTime: Date;
+
+  constructor(dateTime: Date, mapCode: string, actualDataLoad: number, updateTime: Date) {
+    this.dateTime = dateTime;
+    this.mapCode = mapCode;
+    this.actualDataLoad = actualDataLoad;
+    this.updateTime = updateTime;
+  }
 }
 
 export const ActualTotalLoadSchema =
