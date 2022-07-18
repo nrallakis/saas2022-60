@@ -7,16 +7,11 @@ import { PhysicalFlows, PhysicalFlowsDocument } from './ff.schema';
 export class FFService {
   constructor(
     @InjectModel(PhysicalFlows.name)
-    private readonly atlModel: Model<PhysicalFlowsDocument>,
+    private readonly ffModel: Model<PhysicalFlowsDocument>,
   ) {}
 
-  async add(): Promise<void> {
-    await this.atlModel.create({
-      dateTime: new Date('2021-05-20T10:24:51.303Z'),
-      mapCode: 'AB',
-      actualTotalLoad: 100,
-      updateTime: new Date('2022-01-31 01:01:01.000'),
-    });
+  async getCountries() {
+    return this.ffModel.distinct('inMapCode');
   }
 
   async getDataForCountry(

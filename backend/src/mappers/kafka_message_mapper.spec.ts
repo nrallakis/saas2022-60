@@ -1,4 +1,3 @@
-import { Test, TestingModule } from "@nestjs/testing";
 import { ActualTotalLoad } from "../atl/atl.schema";
 import {
   KafkaDataMessage,
