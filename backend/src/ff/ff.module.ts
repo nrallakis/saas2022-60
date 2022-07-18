@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
-import { FfService } from './ff.service';
-import { FfController } from './ff.controller';
+import { FFController } from './ff.controller';
+import { MongooseModule } from '@nestjs/mongoose';
+import { PhysicalFlows, PhysicalFlowsSchema } from './ff.schema';
+import { FFService } from './ff.service';
 
 @Module({
-  controllers: [FfController],
-  providers: [FfService]
+  imports: [
+    MongooseModule.forFeature([
+      { name: PhysicalFlows.name, schema: PhysicalFlowsSchema },
+    ]),
+  ],
+  controllers: [FFController],
+  providers: [FFService],
 })
-export class FfModule {}
+export class FFModule {}

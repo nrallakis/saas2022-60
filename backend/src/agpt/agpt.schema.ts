@@ -1,27 +1,30 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type ActualGenerationPerTypeDocument = ActualGenerationPerType & Document;
+export type ActualGenerationPerTypeDocument = ActualGenerationPerType &
+  Document;
 
 @Schema()
 export class ActualGenerationPerType {
-    @Prop()
-    dateTime: Date;
+  @Prop()
+  dateTime: Date;
 
-    @Prop()
-    mapCode: string;
+  @Prop()
+  mapCode: string;
 
-    @Prop()
-    productionType: string;
+  @Prop()
+  productionType: string;
 
-    @Prop()
-    actualGenerationOutput: number;
+  @Prop()
+  actualGenerationOutput: number;
 
-    @Prop()
-    actualConsumption: number;
+  @Prop()
+  actualConsumption: number;
 
-    @Prop()
-    updateTime: Date;
+  @Prop()
+  updateTime: Date;
 }
 
-export const ActualGenerationPerTypeSchema = SchemaFactory.createForClass(ActualGenerationPerType);
+export const ActualGenerationPerTypeSchema = SchemaFactory.createForClass(
+  ActualGenerationPerType,
+);

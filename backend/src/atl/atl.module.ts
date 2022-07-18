@@ -5,8 +5,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ActualTotalLoadSchema, ActualTotalLoad } from './atl.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name: ActualTotalLoad.name, schema: ActualTotalLoadSchema}])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: ActualTotalLoad.name, schema: ActualTotalLoadSchema },
+    ]),
+  ],
   controllers: [AtlController],
-  providers: [AtlService]
+  providers: [AtlService],
 })
 export class AtlModule {}
