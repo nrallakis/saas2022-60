@@ -7,6 +7,7 @@ import {Button} from "react-bootstrap";
 import {Chart} from "../components/chart";
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import {mapCountryToCode} from "../countries";
+import moment from "moment";
 
 interface DashboardState {
     loading: Boolean;
@@ -26,8 +27,8 @@ function DashboardPage() {
     useEffect(() => {}, []);
 
     const initialState : DashboardState = {
-        data: [[1,1], [1,2], [2,3]],
-        dateFrom: new Date(),
+        data: [],
+        dateFrom: moment().subtract(2, 'year').toDate(),
         dateTo: new Date(),
         dropDownSelections: null,
         loading: false
