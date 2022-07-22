@@ -11,15 +11,17 @@ import {Points} from "../points";
 export class FFController {
   constructor(private readonly ffService: FFService) {}
 
+  @Get('countries')
+  getCountries(): Promise<string[]> {
+    return this.ffService.getCountries();
+  }
+
   @Get(':country')
   getDataForCountry(
     @Param('country') country: string,
     @Query('from') dateFrom: Date,
     @Query('to') dateTo: Date,
-  ): Promise<Points | string[]> {
-    if (country === 'countries') {
-      return this.ffService.getCountries();
-    }
+  ): Promise<Points> {
     return this.ffService.getDataForCountry(
       country,
       new Date(dateFrom),

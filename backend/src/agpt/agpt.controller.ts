@@ -16,15 +16,16 @@ export class AgptController {
     return this.agptService.add();
   }
 
+  @Get('countries')
+  getCountries(): Promise<string[]> {
+    return this.agptService.getCountries();
+  }
   @Get(':country')
   getDataForCountry(
     @Param('country') country: string,
     @Query('from') dateFrom: Date,
     @Query('to') dateTo: Date,
-  ): Promise<Points | string[]>{
-    if (country === 'countries') {
-      return this.agptService.getCountries();
-    }
+  ): Promise<Points>{
     return this.agptService.getDataForCountry(
       country,
       new Date(dateFrom),

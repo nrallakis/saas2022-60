@@ -16,18 +16,18 @@ export class AtlController {
         return this.atlService.add();
     }
 
+    @Get('countries')
+    getCountries(): Promise<string[]> {
+        return this.atlService.getCountries();
+    }
+
     @Get(':country')
     async getDataForCountry(
         @Param('country') country: string,
         @Query('from') dateFrom: string,
         @Query('to') dateTo: string,
-    ): Promise<Points | string[]> {
-        console.log(dateFrom);
-        console.log(dateTo);
-        if (country === 'countries') {
-            return this.atlService.getCountries();
-        }
-        return await this.atlService.getDataForCountry(
+    ): Promise<Points> {
+        return this.atlService.getDataForCountry(
             country,
             new Date(dateFrom),
             new Date(dateTo),
