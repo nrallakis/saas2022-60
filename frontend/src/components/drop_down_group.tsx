@@ -30,6 +30,8 @@ const quantityTypesLabels = [
     'Cross border flows'
 ];
 
+const noData = 'No data';
+
 function quantityTypeToString(type: QuantityType): string {
     if (type == QuantityType.actualTotalLoad) return quantityTypesLabels[0];
     if (type == QuantityType.generationPerType) return quantityTypesLabels[1];
@@ -68,45 +70,42 @@ export default function DropDownGroup(props: DropDownGroupProps) {
         props.onChange(state);
     }, [state]);
 
-    useEffect(() => {
-        const setOptions = async () => {
-            switch (state.quantity) {
-                case QuantityType.actualTotalLoad:
-                    let countryCodes = await service.fetchActualTotalLoadCountries()
-                    let countries = countryCodes.map((code) => mapCodeToCountry(code));
-                    setState({
-                        ...state,
-                        secondSelectionTitle: 'Country',
-                        thirdSelectionTitle: '',
-                        secondOptions: countries
-                    });
-                    break;
-                case QuantityType.generationPerType:
-                    countryCodes = await service.fetchGenerationPerTypeCountries()
-                    countries = countryCodes.map((code) => mapCodeToCountry(code));
-                    setState({
-                        ...state,
-                        secondSelectionTitle: 'Country',
-                        thirdSelectionTitle: 'Generation type',
-                        secondOptions: countries,
-                        thirdOptions: await service.fetchGenerationPerTypeOptions()
-                    });
-                    break;
-                case QuantityType.crossBorderFlows:
-                    countryCodes = await service.fetchCrossBorderFlowsCountries()
-                    countries = countryCodes.map((code) => mapCodeToCountry(code));
-                    setState({
-                        ...state,
-                        secondSelectionTitle: 'Country(from)',
-                        thirdSelectionTitle: 'Country(to)',
-                        secondOptions: countries,
-                        thirdOptions: countries,
-                    });
-                    break;
-            }
+    const fetchAndSetOptions = async () => {
+        if (state.quantity == QuantityType.actualTotalLoad) {
+            let countryCodes = await service.fetchActualTotalLoadCountries()
+            let countries = countryCodes.map((code) => mapCodeToCountry(code));
+            setState({
+                ...state,
+                secondSelectionTitle: 'Country',
+                thirdSelectionTitle: '',
+                secondOptions: countries,
+                thirdOptions: [],
+            });
+        } else if (state.quantity == QuantityType.generationPerType) {
+            let countryCodes = await service.fetchGenerationPerTypeCountries()
+            let countries = countryCodes.map((code) => mapCodeToCountry(code));
+            setState({
+                ...state,
+                secondSelectionTitle: 'Country',
+                thirdSelectionTitle: 'Generation type',
+                secondOptions: countries,
+                thirdOptions: countries
+            });
+        } else if (state.quantity == QuantityType.crossBorderFlows) {
+            let countryCodes = await service.fetchCrossBorderFlowsCountries()
+            let countries = countryCodes.map((code) => mapCodeToCountry(code));
+            setState({
+                ...state,
+                secondSelectionTitle: 'Country(from)',
+                thirdSelectionTitle: 'Country(to)',
+                secondOptions: countries,
+                thirdOptions: countries,
+            });
         }
+    }
 
-        setOptions();
+    useEffect(() => {
+        fetchAndSetOptions();
     }, [state.quantity]);
 
     const showThirdSelection = state.quantity !== QuantityType.actualTotalLoad;
