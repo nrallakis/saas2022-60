@@ -6,15 +6,16 @@ import json
 from utils import *
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 : 
-        print("usage: python filename 'YYYY_MM_DD_HH'")
-        exit(1)
-    _, old_csv = csv_path(starting_date=sys.argv[1], file_ext_type="PhysicalFlows12.1.G.csv", time_interval=(0,0,0))
-    _, new_csv = csv_path(starting_date=sys.argv[1], file_ext_type="PhysicalFlows12.1.G.csv", time_interval=(0,0,1))
-    data_prev = loadAndFilterData(old_csv, dataFilter=ff.filterData)
-    data_new = loadAndFilterData(new_csv, dataFilter=ff.filterData)
-    ins, upd = ff.find_diffs(data_prev, data_new)
-
-    json = ff.json_data(ins, upd)
-    print(json)
-    # sendToKafka(json, 'physical-flow', 'localhost')
+    data_path = 'data'
+    files = os.listdir(data_path)
+    for i in range(len(files)-1):
+        print(files[i])
+        old_csv = os.path.join(data_path, files[i])
+        new_csv = os.path.join(data_path, files[i+1])
+        data_prev = loadAndFilterData(old_csv, dataFilter=atl.filterData)
+        data_new = loadAndFilterData(new_csv, dataFilter=atl.filterData)
+        inserts, updates = atl.find_diffs(data_prev, data_new)
+        json = atl.json_data(inserts, updates)
+        sendToKafka(json, topicName='physical-flow', hostname='localhost')
+        if len(sys.argv) > 1:
+            time.sleep(int(sys.argv[1]))
