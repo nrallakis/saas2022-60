@@ -29,8 +29,8 @@ export class AgptService {
     return this.agptModel.distinct('mapCode');
   }
 
-  async getGenerationTypes() {
-    return this.agptModel.distinct('productionType');
+  async getGenerationTypes(country: string) {
+    return this.agptModel.find({mapCode: country}).distinct('productionType');
   }
 
   async getDataForCountry(

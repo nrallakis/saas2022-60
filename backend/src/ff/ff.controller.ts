@@ -11,9 +11,14 @@ import {Points} from "../points";
 export class FFController {
   constructor(private readonly ffService: FFService) {}
 
-  @Get('countries')
-  getCountries(): Promise<string[]> {
-    return this.ffService.getCountries();
+  @Get('countriesFrom')
+  getCountriesFrom(): Promise<string[]> {
+    return this.ffService.getCountriesFrom();
+  }
+
+  @Get('countriesTo')
+  getCountriesTo(@Query('from') countryFrom: string): Promise<string[]> {
+    return this.ffService.getCountriesTo(countryFrom);
   }
 
   @Get(':countryFrom/:countryTo')

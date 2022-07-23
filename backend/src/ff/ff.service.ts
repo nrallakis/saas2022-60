@@ -10,8 +10,12 @@ export class FFService {
     private readonly ffModel: Model<PhysicalFlowsDocument>,
   ) {}
 
-  async getCountries() {
-    return this.ffModel.distinct('inMapCode');
+  async getCountriesFrom() {
+    return this.ffModel.distinct('outMapCode');
+  }
+
+  async getCountriesTo(countryFrom: string) {
+    return this.ffModel.find({outMapCode: countryFrom}).distinct('inMapCode');
   }
 
   async getDataForCountry(

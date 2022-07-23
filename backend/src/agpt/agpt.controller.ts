@@ -21,9 +21,9 @@ export class AgptController {
     return this.agptService.getCountries();
   }
 
-  @Get('types')
-  getGenerationTypes(): Promise<string[]> {
-    return this.agptService.getGenerationTypes();
+  @Get(':country/types')
+  getGenerationTypes(@Param('country') country: string): Promise<string[]> {
+    return this.agptService.getGenerationTypes(country);
   }
 
   @Get(':type/:country')
