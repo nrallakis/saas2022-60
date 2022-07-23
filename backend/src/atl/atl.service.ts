@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { ActualTotalLoad, ActualTotalLoadDocument } from './atl.schema';
+import {Injectable} from '@nestjs/common';
+import {InjectModel} from '@nestjs/mongoose';
+import {Model} from 'mongoose';
+import {ActualTotalLoad, ActualTotalLoadDocument} from './atl.schema';
 
 @Injectable()
 export class AtlService {
@@ -25,12 +25,15 @@ export class AtlService {
     dateFrom: Date,
     dateTo: Date,
   ): Promise<number[][]> {
-    return this.atlModel.find({
-      country: country,
+    const data = await this.atlModel.find({
+      mapCode: country,
       dateTime: {
         "$gt": dateFrom,
         "$lt": dateTo,
       }
+    });
+    return data.map(function (point: ActualTotalLoad) {
+      return [point.dateTime.valueOf(), point.actualDataLoad];
     });
   }
 

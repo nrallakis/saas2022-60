@@ -16,14 +16,16 @@ export class FFController {
     return this.ffService.getCountries();
   }
 
-  @Get(':country')
+  @Get(':countryFrom/:countryTo')
   getDataForCountry(
-    @Param('country') country: string,
+    @Param('countryFrom') countryFrom: string,
+    @Param('countryTo') countryTo: string,
     @Query('from') dateFrom: Date,
     @Query('to') dateTo: Date,
   ): Promise<Points> {
     return this.ffService.getDataForCountry(
-      country,
+      countryFrom,
+      countryTo,
       new Date(dateFrom),
       new Date(dateTo),
     );

@@ -5,6 +5,7 @@ import {
   ActualGenerationPerType,
   ActualGenerationPerTypeDocument,
 } from './agpt.schema';
+import {ActualTotalLoad} from "../atl/atl.schema";
 
 @Injectable()
 export class AgptService {
@@ -28,14 +29,26 @@ export class AgptService {
     return this.agptModel.distinct('mapCode');
   }
 
+  async getGenerationTypes() {
+    return this.agptModel.distinct('productionType');
+  }
+
   async getDataForCountry(
     country: string,
+    productionType: string,
     dateFrom: Date,
     dateTo: Date,
   ): Promise<number[][]> {
-    return this.agptModel.find({
-      country: country,
-      dateTime: {$gt: dateFrom, $lt: dateTo}
+    const data = await this.agptModel.find({
+      mapCode: country,
+      productionType: productionType,
+      dateTime: {
+        "$gt": dateFrom,
+        "$lt": dateTo,
+      }
+    });
+    return data.map(function (point: ActualGenerationPerType) {
+      return [point.dateTime.valueOf(), point.actualGenerationOutput];
     });
   }
 }

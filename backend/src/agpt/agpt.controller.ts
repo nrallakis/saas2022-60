@@ -20,14 +20,22 @@ export class AgptController {
   getCountries(): Promise<string[]> {
     return this.agptService.getCountries();
   }
-  @Get(':country')
+
+  @Get('types')
+  getGenerationTypes(): Promise<string[]> {
+    return this.agptService.getGenerationTypes();
+  }
+
+  @Get(':type/:country')
   getDataForCountry(
+    @Param('type') type: string,
     @Param('country') country: string,
     @Query('from') dateFrom: Date,
     @Query('to') dateTo: Date,
   ): Promise<Points>{
     return this.agptService.getDataForCountry(
       country,
+      type,
       new Date(dateFrom),
       new Date(dateTo),
     );
