@@ -37,6 +37,7 @@ export class ConsumerRunner implements OnModuleInit {
       {
         eachMessage: async ({ topic, partition, message }) => {
           let parsedMessage: KafkaDataMessage = JSON.parse(JSON.parse(message.value.toString()));
+          console.log(parsedMessage);
           switch (topic) {
             case 'actual-generation-per-type':
               let [agptInserts, agptUpdates] = kafkaToActualGenerationPerType(parsedMessage);
