@@ -9,6 +9,9 @@ import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import {mapCountryToCode} from "../countries";
 import moment from "moment";
 import {QuantityType} from "../quantity";
+import socketIOClient from "socket.io-client";
+
+const ENDPOINT = "http://localhost:3001";
 
 interface DashboardState {
     data?: Points | null;
@@ -20,11 +23,19 @@ interface DashboardState {
 function DashboardPage() {
     let service: EnergyService = new DataService();
 
-    //TODO: connect to websocket to listen to updates
-    //TODO: onDataUpdate(): if data == the same with the filtered, refresh
-
-    // Component did mount
-    useEffect(() => {}, []);
+    useEffect(() => {
+        const socket = socketIOClient(ENDPOINT);
+        socket.on('update', data => {
+            console.log(data);
+            const quantity = state.dropDownSelections?.quantity;
+            let isGenerationPerType = data === 'actual-generation-per-type' && quantity === QuantityType.generationPerType;
+            let isActualTotalLoad = data === 'actual-total-load' && quantity === QuantityType.actualTotalLoad;
+            let isPhysicalFlows = data === 'physical-flow' && quantity === QuantityType.crossBorderFlows;
+            if (isGenerationPerType || isPhysicalFlows || isActualTotalLoad) {
+                onFilterClicked();
+            }
+        });
+    }, []);
 
     const initialState : DashboardState = {
         data: [],

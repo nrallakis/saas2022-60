@@ -5,6 +5,7 @@ import { KafkaModule } from './kafka/kafka.module';
 import { AgptModule } from './agpt/agpt.module';
 import { FFModule } from './ff/ff.module';
 import { ConsumerRunner } from "./kafka.runner";
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { ConsumerRunner } from "./kafka.runner";
     FFModule,
     AgptModule,
   ],
-  providers: [ConsumerRunner],
+  providers: [ConsumerRunner, AppGateway],
 })
 export class AppModule {}

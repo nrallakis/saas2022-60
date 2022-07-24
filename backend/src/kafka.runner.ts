@@ -10,6 +10,7 @@ import {
   kafkaToActualGenerationPerType,
   kafkaToActualTotalLoad, kafkaToPhysicalFlows
 } from "./mappers/kafka_message_mapper";
+import {AppGateway} from "./app.gateway";
 
 
 @Injectable()
@@ -22,6 +23,7 @@ export class ConsumerRunner implements OnModuleInit {
     private readonly agptModel: Model<ActualGenerationPerTypeDocument>,
     @InjectModel(PhysicalFlows.name)
     private readonly ffModel: Model<PhysicalFlowsDocument>,
+    private readonly gateway: AppGateway
   ) {}
 
   async onModuleInit() {
@@ -37,7 +39,7 @@ export class ConsumerRunner implements OnModuleInit {
       {
         eachMessage: async ({ topic, partition, message }) => {
           let parsedMessage: KafkaDataMessage = JSON.parse(JSON.parse(message.value.toString()));
-          console.log(parsedMessage);
+          this.gateway.wss.emit('update', topic);
           switch (topic) {
             case 'actual-generation-per-type':
               let [agptInserts, agptUpdates] = kafkaToActualGenerationPerType(parsedMessage);
