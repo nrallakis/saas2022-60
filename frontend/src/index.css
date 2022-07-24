@@ -45,3 +45,7 @@ abbr[title], abbr[data-bs-original-title] {
 g.highcharts-legend-item.highcharts-line-series.highcharts-color-0.highcharts-series-0 {
   display: none;
 }
+
+text.highcharts-title {
+  display: none;
+}

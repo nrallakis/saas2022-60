@@ -25,14 +25,14 @@ function DashboardPage() {
 
     useEffect(() => {
         const socket = socketIOClient(ENDPOINT);
-        socket.on('update', data => {
+        socket.on('update', async data => {
             console.log(data);
             const quantity = state.dropDownSelections?.quantity;
             let isGenerationPerType = data === 'actual-generation-per-type' && quantity === QuantityType.generationPerType;
             let isActualTotalLoad = data === 'actual-total-load' && quantity === QuantityType.actualTotalLoad;
             let isPhysicalFlows = data === 'physical-flow' && quantity === QuantityType.crossBorderFlows;
             if (isGenerationPerType || isPhysicalFlows || isActualTotalLoad) {
-                onFilterClicked();
+                await onFilterClicked();
             }
         });
     }, []);
