@@ -12,13 +12,11 @@ export function Chart(props: ChartProps) {
         chart: {
             zoomType: 'x'
         },
+        title: {
+            text: 'Chart'
+        },
         subtitle: {
             text: 'Using the Boost module'
-        },
-        accessibility: {
-            screenReaderSection: {
-                beforeChartFormat: '<{headingTagName}>{chartTitle}</{headingTagName}><div>{chartSubtitle}</div><div>{chartLongdesc}</div><div>{xAxisDescription}</div><div>{yAxisDescription}</div>'
-            }
         },
         tooltip: {
             valueDecimals: 2
@@ -29,7 +27,8 @@ export function Chart(props: ChartProps) {
             },
             series: [{
                 data: props.data,
-                lineWidth: 0.5,     
+                lineWidth: 0.5,
+                name: '',
             }],
         },
         hoverData: null
