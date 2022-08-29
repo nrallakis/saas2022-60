@@ -1,14 +1,19 @@
 import Header from "../components/header";
-import DropDownGroup, {DropDownChangeListener, QuantityType} from "../components/drop_down_group";
+import DropDownGroup, {DropDownChangeListener} from "../components/drop_down_group";
 import {useEffect, useState} from "react";
 import {Points} from "../data/point";
 import {DataService, EnergyService} from "../data/energy_service";
 import {Button} from "react-bootstrap";
 import {Chart} from "../components/chart";
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
+import {mapCountryToCode} from "../countries";
+import moment from "moment";
+import {QuantityType} from "../quantity";
+import socketIOClient from "socket.io-client";
+
+const ENDPOINT = "http://localhost:3001";
 
 interface DashboardState {
-    loading: Boolean;
     data?: Points | null;
     dateFrom?: Date | null;
     dateTo?: Date | null;
@@ -18,18 +23,25 @@ interface DashboardState {
 function DashboardPage() {
     let service: EnergyService = new DataService();
 
-    //TODO: connect to websocket to listen to updates
-    //TODO: onDataUpdate(): if data == the same with the filtered, refresh
-
-    // Component did mount
-    useEffect(() => {}, []);
+    useEffect(() => {
+        const socket = socketIOClient(ENDPOINT);
+        socket.on('update', async data => {
+            console.log(data);
+            const quantity = state.dropDownSelections?.quantity;
+            let isGenerationPerType = data === 'actual-generation-per-type' && quantity === QuantityType.generationPerType;
+            let isActualTotalLoad = data === 'actual-total-load' && quantity === QuantityType.actualTotalLoad;
+            let isPhysicalFlows = data === 'physical-flow' && quantity === QuantityType.crossBorderFlows;
+            if (isGenerationPerType || isPhysicalFlows || isActualTotalLoad) {
+                await onFilterClicked();
+            }
+        });
+    }, []);
 
     const initialState : DashboardState = {
-        data: [[1,1], [1,2], [2,3]],
-        dateFrom: null,
-        dateTo: null,
+        data: [],
+        dateFrom: moment().subtract(2, 'year').toDate(),
+        dateTo: new Date(),
         dropDownSelections: null,
-        loading: false
     }
     const [state, setState] = useState(initialState);
 
@@ -43,45 +55,36 @@ function DashboardPage() {
             ...state,
             dateFrom: start,
             dateTo: end,
-        })
-        console.log(start);
-        console.log(end);
-    }
-
-    function onDropDownChange(dropDownSelections: DropDownChangeListener) {
-        setState({
-            ...state,
-            dropDownSelections: dropDownSelections
         });
     }
 
+    function onDropDownChange(dropDownSelections: DropDownChangeListener) {
+        setState({...state, dropDownSelections: dropDownSelections});
+    }
+
     async function onFilterClicked(): Promise<void> {
-        //setState({...state, loading: true});
         const quantity = state.dropDownSelections?.quantity;
         const dateStart = state.dateFrom!;
         const dateEnd = state.dateTo!;
-        if (quantity == QuantityType.actualTotalLoad) {
+        if (quantity === QuantityType.actualTotalLoad) {
             let country = state.dropDownSelections?.secondSelection!;
-            setState({
-                ...state,
-                data: await service.fetchActualTotalLoad(country, dateStart, dateEnd)
-            });
-        } else if (quantity == QuantityType.generationPerType) {
+            let countryCode = mapCountryToCode(country);
+            let data = await service.fetchActualTotalLoad(countryCode, dateStart, dateEnd);
+            setState({...state, data: data});
+        } else if (quantity === QuantityType.generationPerType) {
             let country = state.dropDownSelections?.secondSelection!;
-            const generationType = state.dropDownSelections?.thirdSelection!;
-            setState({
-                ...state,
-                data: await service.fetchGenerationPerType(country, generationType, dateStart, dateEnd)
-            });
-        } else if (quantity == QuantityType.crossBorderFlows) {
-            const countryFrom = state.dropDownSelections?.secondSelection!;
-            const countryTo = state.dropDownSelections?.thirdSelection!;
-            setState({
-                ...state,
-                data: await service.fetchCrossBorderFlows(countryFrom, countryTo, dateStart, dateEnd)
-            });
+            let generationType = state.dropDownSelections?.thirdSelection!;
+            let countryCode = mapCountryToCode(country);
+            let data = await service.fetchGenerationPerType(countryCode, generationType, dateStart, dateEnd);
+            setState({...state, data: data});
+        } else if (quantity === QuantityType.crossBorderFlows) {
+            let countryFrom = state.dropDownSelections?.secondSelection!;
+            let countryTo = state.dropDownSelections?.thirdSelection!;
+            let countryCodeFrom = mapCountryToCode(countryFrom);
+            let countryCodeTo = mapCountryToCode(countryTo);
+            let data = await service.fetchCrossBorderFlows(countryCodeFrom, countryCodeTo, dateStart, dateEnd);
+            setState({...state, data: data});
         }
-        //setState({...state, loading: false});
     }
 
     return (
@@ -91,7 +94,7 @@ function DashboardPage() {
                 <div className="row">
                     <div className="col-4" >
                         <h5>Date range</h5>
-                        <DateRangePicker onChange={onDateChange} format="dd-MM-y" value={[state.dateFrom ?? new Date(), state.dateTo ?? new Date()]} />
+                        <DateRangePicker onChange={onDateChange} format="dd/MM/y" value={[state.dateFrom!, state.dateTo!]} />
                         <div className="pt-3" />
                         <DropDownGroup onChange={onDropDownChange} />
                         <div className="pt-3" />

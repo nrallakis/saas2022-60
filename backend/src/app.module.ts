@@ -1,11 +1,20 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AtlModule } from './atl/atl.module';
+import { KafkaModule } from './kafka/kafka.module';
+import { AgptModule } from './agpt/agpt.module';
+import { FFModule } from './ff/ff.module';
+import { ConsumerRunner } from "./kafka.runner";
+import { AppGateway } from './app.gateway';
 
 @Module({
-  imports: [AtlModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost:27017/saas'),
+    AtlModule,
+    KafkaModule,
+    FFModule,
+    AgptModule,
+  ],
+  providers: [ConsumerRunner, AppGateway],
 })
 export class AppModule {}

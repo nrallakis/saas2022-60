@@ -7,3 +7,4 @@ package-lock.json
 *.csv
 architecture/*.vpp.bak*
 data microservices/**/__pycache__
+data_microservices/*/__pycache__
